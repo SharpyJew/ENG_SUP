@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Инженерный справочник</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --blueprint: #0b3d63;
+    --blueprint-line: #2f6690;
+    --paper: #eef3f6;
+    --paper-line: #c9d8e2;
+    --ink: #0d2130;
+    --accent: #ff6a3d;
+    --ok: #1f8a5f;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:var(--sans);
+    background:var(--blueprint);
+    background-image:
+      linear-gradient(var(--blueprint-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color:var(--paper);
+    min-height:100vh;
+  }
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(11,61,99,.94);
+    backdrop-filter: blur(6px);
+    border-bottom:1px solid var(--blueprint-line);
+  }
+  .topbar-inner{
+    max-width:1080px; margin:0 auto;
+    display:flex; align-items:center; gap:6px;
+    padding:14px 16px;
+    flex-wrap:wrap;
+  }
+  .brand{
+    font-family:var(--mono); font-weight:700; font-size:14px;
+    color:#fff; letter-spacing:.02em;
+    margin-right:18px;
+    white-space:nowrap;
+  }
+  .brand span{color:var(--accent);}
+  nav{display:flex; gap:4px; flex-wrap:wrap;}
+  nav button{
+    font-family:var(--mono);
+    font-size:12.5px;
+    background:transparent;
+    border:1px solid transparent;
+    color:#bcd6e6;
+    padding:8px 12px;
+    border-radius:3px;
+    cursor:pointer;
+    letter-spacing:.02em;
+  }
+  nav button:hover{ border-color:var(--blueprint-line); color:#fff; }
+  nav button.active{
+    background:#fff; color:var(--blueprint); font-weight:700;
+  }
+
+  .wrap{max-width:1080px;margin:0 auto; padding: 28px 16px 70px;}
+  .page{display:none;}
+  .page.active{display:block; animation: rise .35s ease;}
+  @keyframes rise{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:.14em;
+    text-transform:uppercase; color:#9fc4dd; margin-bottom:8px;
+  }
+  h1{ font-size: clamp(26px, 4.5vw, 38px); line-height:1.05; margin:0 0 10px; font-weight:700; color:#fff; }
+  h2{ font-size:20px; color:#fff; margin: 0 0 4px; }
+  .sub{color:#c3dbe9; font-size:15px; max-width:70ch; line-height:1.55;}
+
+  .panel{
+    background: var(--paper); color: var(--ink);
+    border-radius: 4px; padding: 22px; margin-top:20px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.28);
+    position:relative;
+  }
+  .panel::before{
+    content:""; position:absolute; inset:0;
+    border: 1px solid var(--paper-line); border-radius:4px; pointer-events:none;
+  }
+
+  /* home cards */
+  .cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:16px; margin-top:24px; }
+  .card{
+    background:var(--paper); color:var(--ink); border-radius:4px; padding:20px;
+    cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.22); transition: transform .15s ease;
+    border:1px solid var(--paper-line);
+  }
+  .card:hover{ transform: translateY(-3px); }
+  .card .num{ font-family:var(--mono); color:var(--accent); font-weight:700; font-size:13px; }
+  .card h3{ margin:8px 0 6px; font-size:18px; }
+  .card p{ margin:0; font-size:13px; color:#4c6577; line-height:1.5;}
+
+  /* search + table */
+  .toolbar{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+  .search{
+    flex:1; min-width:220px;
+    font-family:var(--mono); font-size:14px;
+    padding:10px 12px; border:1.5px solid var(--paper-line); border-radius:3px;
+    background:#fff; color:var(--ink);
+  }
+  select.filter{
+    font-family:var(--mono); font-size:13px; padding:10px 10px;
+    border:1.5px solid var(--paper-line); border-radius:3px; background:#fff; color:var(--ink);
+  }
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  thead th{
+    text-align:left; font-family:var(--mono); font-size:11px; text-transform:uppercase;
+    letter-spacing:.04em; color:#4c6577; padding:8px 10px; border-bottom:2px solid var(--paper-line);
+    white-space:nowrap;
+  }
+  tbody td{ padding:10px; border-bottom:1px solid var(--paper-line); vertical-align:top; }
+  tbody tr:hover{ background:#e4ecf1; }
+  .tag{
+    display:inline-block; font-family:var(--mono); font-size:11px; padding:2px 8px;
+    border-radius:20px; background:#dbe7ee; color:var(--blueprint); white-space:nowrap;
+  }
+  .tag.status-ok{ background:#d7f0e2; color:var(--ok); }
+  .tag.status-off{ background:#f3d9d3; color:#a13a20; }
+  .empty{ padding:30px; text-align:center; color:#7488a3; font-family:var(--mono); font-size:13px;}
+  .count{ font-family:var(--mono); font-size:12px; color:#4c6577; margin-bottom:10px;}
+  .doclink{ font-family:var(--mono); font-size:11.5px; color:var(--blueprint); text-decoration:none; border-bottom:1px dashed var(--blueprint-line); }
+  .doclink:hover{ color:var(--accent); border-color:var(--accent); }
+  .doclink.file{ color:#7488a3; }
+  .doclink.file:hover{ color:var(--ok); }
+
+  .howto{
+    margin-top:20px; font-size:13px; line-height:1.6; color:#264a3f;
+    background:#eaf6ee; border:1px solid #bfe3cc; border-radius:3px; padding:14px 16px;
+  }
+  .howto summary{ cursor:pointer; font-weight:700; font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:.04em;}
+
+  footer{ margin-top:36px; font-size:12px; color:#9fc4dd; font-family:var(--mono); text-align:center; }
+
+  /* --- calculator (tolerances page) reused styles --- */
+  .row{display:flex; gap:16px; flex-wrap:wrap;}
+  .field{flex:1; min-width:160px;}
+  label{ display:block; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:#4c6577; margin-bottom:6px; }
+  select, input[type=number]{
+    width:100%; font-family:var(--mono); font-size:16px; padding:10px 12px;
+    border:1.5px solid var(--paper-line); border-radius:3px; background:#fff; color:var(--ink);
+  }
+  select:focus, input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .toggle-group{display:flex; gap:8px; margin-top:6px;}
+  .toggle-group button{
+    flex:1; font-family:var(--mono); font-size:13px; padding:9px 8px;
+    border:1.5px solid var(--paper-line); background:#fff; color:var(--ink); border-radius:3px; cursor:pointer;
+  }
+  .toggle-group button.active{ background:var(--blueprint); border-color:var(--blueprint); color:#fff; }
+  .result{ margin-top:24px; border-top: 2px dashed var(--paper-line); padding-top:20px; }
+  .result-grid{display:flex; gap:16px; flex-wrap:wrap;}
+  .stat{ flex:1; min-width:150px; background:#fff; border:1.5px solid var(--paper-line); border-radius:3px; padding:14px 16px; }
+  .stat .k{font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#4c6577;}
+  .stat .v{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--blueprint); margin-top:4px;}
+  .stat.hi .v{color:var(--accent);}
+  .diagram{ margin-top:20px; height:120px; position:relative; background:#fff; border:1.5px solid var(--paper-line); border-radius:3px; overflow:hidden; }
+  .zero-line{position:absolute; left:0; right:0; top:60px; height:1px; background:#b7c6cf;}
+  .zero-label{position:absolute; left:8px; top:63px; font-family:var(--mono); font-size:10px; color:#8fa3ae;}
+  .bar{position:absolute; left:40%; width:20%; background: var(--accent); opacity:.85; border-radius:2px;}
+  .bar-label{position:absolute; font-family:var(--mono); font-size:11px; font-weight:700; color:var(--ink);}
+  .note{ margin-top:18px; font-size:13px; line-height:1.5; color:#5a4300; background:#fff4d6; border:1px solid #e8cf80; border-radius:3px; padding:12px 14px; }
+  .note.warn{ color:#7a1f10; background:#ffe4dc; border-color:#f2a48f; font-weight:600;}
+  .missing{ margin-top:18px; font-family:var(--mono); font-size:14px; color:#7a1f10; background:#ffe4dc; border:1px solid #f2a48f; border-radius:3px; padding:14px 16px; }
+
+  @media (max-width: 640px){
+    .brand{ margin-right:8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">ИНЖ<span>.</span>СПРАВОЧНИК</div>
+    <nav id="nav">
+      <button data-page="home" class="active">Главная</button>
+      <button data-page="gost">ГОСТы</button>
+      <button data-page="tolerances">Допуски и посадки</button>
+      <button data-page="materials">Материалы</button>
+      <button data-page="literature">Анурьев / Литература</button>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- HOME -->
+  <section id="page-home" class="page active">
+    <div class="eyebrow">Личная база · Механическое проектирование</div>
+    <h1>Инженерный справочник</h1>
+    <p class="sub">ГОСТы, допуски и посадки, марки сталей, оглавление Анурьева — всё в одном месте, без переключения между вкладками.</p>
+    <div class="cards">
+      <div class="card" onclick="showPage('gost')">
+        <div class="num">01</div>
+        <h3>ГОСТы / Стандарты</h3>
+        <p>Резьбы, допуски, чертежи, сварка, материалы — с фильтром по категории и статусу.</p>
+      </div>
+      <div class="card" onclick="showPage('tolerances')">
+        <div class="num">02</div>
+        <h3>Допуски и посадки</h3>
+        <p>Калькулятор полей допусков + справочные таблицы IT-квалитетов.</p>
+      </div>
+      <div class="card" onclick="showPage('materials')">
+        <div class="num">03</div>
+        <h3>Материалы</h3>
+        <p>Стали и сплавы: химсостав, механические свойства, зарубежные аналоги.</p>
+      </div>
+      <div class="card" onclick="showPage('literature')">
+        <div class="num">04</div>
+        <h3>Анурьев / Литература</h3>
+        <p>Оглавление и ключевые таблицы справочника конструктора.</p>
+      </div>
+    </div>
+
+    <details class="howto" style="margin-top:32px; background:#fdf3d8; border-color:#e8cf80; color:#5a4300;">
+      <summary>Как добавить новую запись</summary>
+      <div style="margin-top:10px;">
+        Все данные хранятся прямо в этом файле (index.html), в массивах gostData / materialsData / literatureData ближе к концу файла.
+        Чтобы добавить строку: открой файл на GitHub → нажми на карандаш (Edit) → скопируй существующую строку по образцу, поменяй значения → Commit changes.
+        Сайт обновится сам через 1–2 минуты.
+      </div>
+    </details>
+
+    <details class="howto" style="margin-top:12px;">
+      <summary>Как подключить файлы (PDF ГОСТов, Анурьев и т.д.)</summary>
+      <div style="margin-top:10px;">
+        В таблицах есть ссылка «Мой файл» — она ведёт на файл в папке <code>docs/</code> внутри репозитория, например <code>docs/gost-1050-2013.pdf</code>.
+        Пока файла там нет — ссылка не работает (404), это нормально.<br><br>
+        1. Скачай нужный PDF легально (ГОСТ — на docs.cntd.ru, standartgost.ru, protect.gost.ru; Анурьева — если купил бумажную/электронную версию, отсканируй или используй свою легальную копию).<br>
+        2. В репозитории на GitHub создай папку <code>docs</code> (Add file → Create new file → напиши <code>docs/имя-файла.pdf</code> — папка создастся сама) и загрузи туда файл с ровно таким именем, как в колонке <code>file</code> в данных (например <code>gost-1050-2013.pdf</code>).<br>
+        3. Ссылка «Мой файл» в таблице заработает автоматически.<br><br>
+        <b>Про Анурьева отдельно:</b> это книга под авторским правом, я не могу подобрать или прислать ссылку на её скачивание — сюда нужно класть только свою легально полученную копию.
+      </div>
+    </details>
+  </section>
+
+  <!-- GOST -->
+  <section id="page-gost" class="page">
+    <div class="eyebrow">Раздел 01</div>
+    <h1>ГОСТы и стандарты</h1>
+    <p class="sub">Резьбы, допуски и посадки, чертежи, сварка, материалы.</p>
+    <div class="panel">
+      <div class="toolbar">
+        <input class="search" id="gost-search" placeholder="Поиск по номеру или названию…">
+        <select class="filter" id="gost-cat"><option value="">Все категории</option></select>
+        <select class="filter" id="gost-status"><option value="">Все статусы</option></select>
+      </div>
+      <div class="count" id="gost-count"></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Номер</th><th>Название</th><th>Категория</th><th>Статус</th><th>Описание</th><th>Ссылки</th></tr></thead>
+          <tbody id="gost-body"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="gost-empty" style="display:none;">Ничего не найдено</div>
+    </div>
+  </section>
+
+  <!-- TOLERANCES -->
+  <section id="page-tolerances" class="page">
+    <div class="eyebrow">Раздел 02 · ГОСТ 25346 / 25347 · ISO 286</div>
+    <h1>Допуски и посадки</h1>
+    <p class="sub">Введи номинальный размер, выбери поле допуска и квалитет — получишь отклонения в микрометрах.</p>
+
+    <div class="panel">
+      <div class="row">
+        <div class="field">
+          <label for="size">Номинальный размер, мм</label>
+          <input type="number" id="size" min="1" max="500" value="25" step="1">
+        </div>
+        <div class="field">
+          <label for="letter">Поле допуска</label>
+          <select id="letter"></select>
+        </div>
+        <div class="field">
+          <label for="grade">Квалитет</label>
+          <select id="grade"></select>
+        </div>
+      </div>
+      <div class="field" style="margin-top:16px;">
+        <label>Тип элемента</label>
+        <div class="toggle-group">
+          <button id="btn-shaft" class="active">Вал (строчные: h, k, p…)</button>
+          <button id="btn-hole">Отверстие (прописные: H, K, P…)</button>
+        </div>
+      </div>
+      <div id="output"></div>
+    </div>
+
+    <div class="panel" style="margin-top:20px;">
+      <h2 style="color:var(--ink);">Таблица IT-квалитетов (мкм)</h2>
+      <p style="color:#4c6577; font-size:13px; margin-top:2px;">Справочные значения допуска по ГОСТ 25346-2013 для основных квалитетов.</p>
+      <div style="overflow-x:auto; margin-top:12px;">
+        <table id="it-table"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MATERIALS -->
+  <section id="page-materials" class="page">
+    <div class="eyebrow">Раздел 03</div>
+    <h1>Материалы — стали и сплавы</h1>
+    <p class="sub">Марки, ГОСТ, химсостав, механические свойства, применение.</p>
+    <div class="panel">
+      <div class="toolbar">
+        <input class="search" id="mat-search" placeholder="Поиск по марке или ГОСТу…">
+      </div>
+      <div class="count" id="mat-count"></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Марка</th><th>ГОСТ</th><th>Химсостав</th><th>Мех. свойства</th><th>Применение</th><th>Аналоги</th><th>Файл</th></tr></thead>
+          <tbody id="mat-body"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="mat-empty" style="display:none;">Ничего не найдено</div>
+    </div>
+  </section>
+
+  <!-- LITERATURE -->
+  <section id="page-literature" class="page">
+    <div class="eyebrow">Раздел 04</div>
+    <h1>Анурьев / Литература</h1>
+    <p class="sub">Оглавление томов и ключевые таблицы справочника конструктора.</p>
+    <div class="panel">
+      <div class="toolbar">
+        <input class="search" id="lit-search" placeholder="Поиск по теме или разделу…">
+      </div>
+      <div class="count" id="lit-count"></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Источник</th><th>Том/раздел</th><th>Тема</th><th>Страницы</th><th>Содержание</th><th>Файл</th></tr></thead>
+          <tbody id="lit-body"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="lit-empty" style="display:none;">Ничего не найдено</div>
+    </div>
+  </section>
+
+  <footer>Инженерный справочник · обновляется прямо на GitHub · значения — справочные, для ответственных расчётов сверяйся с действующей редакцией ГОСТ</footer>
+</div>
+
+<script>
+/* ============ NAVIGATION ============ */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
+  window.scrollTo({top:0, behavior:'instant'});
+}
+document.getElementById('nav').addEventListener('click', e=>{
+  if(e.target.tagName==='BUTTON') showPage(e.target.dataset.page);
+});
+
+/* ============ DATA — edit these arrays to add records ============ */
+const gostData = [
+  {num:"ГОСТ 24705-2004", name:"Основные нормы взаимозаменяемости. Резьба метрическая. Основные размеры", cat:"Резьбы", status:"Действующий", desc:"Базовый стандарт метрических резьб", file:"gost-24705-2004.pdf"},
+  {num:"ГОСТ 9150-2002", name:"Профиль метрической резьбы", cat:"Резьбы", status:"Действующий", desc:"Геометрия профиля резьбы", file:"gost-9150-2002.pdf"},
+  {num:"ГОСТ 16093-2004", name:"Резьба метрическая. Допуски. Посадки с зазором", cat:"Резьбы", status:"Действующий", desc:"Допуски и посадки резьбовых соединений", file:"gost-16093-2004.pdf"},
+  {num:"ГОСТ 25346-2013", name:"Основные нормы взаимозаменяемости. Ряды допусков", cat:"Допуски и посадки", status:"Действующий", desc:"Система допусков ISO, ряды IT", file:"gost-25346-2013.pdf"},
+  {num:"ГОСТ 25347-2013", name:"Поля допусков для размеров от 1 до 500 мм", cat:"Допуски и посадки", status:"Действующий", desc:"Основной справочник полей допусков", file:"gost-25347-2013.pdf"},
+  {num:"ГОСТ 2.308-2011", name:"ЕСКД. Указание допусков формы и расположения поверхностей", cat:"Чертежи", status:"Действующий", desc:"Обозначения на чертежах", file:"gost-2-308-2011.pdf"},
+  {num:"ГОСТ 2.309-73", name:"ЕСКД. Обозначение шероховатости поверхностей", cat:"Чертежи", status:"Действующий", desc:"Шероховатость на чертежах", file:"gost-2-309-73.pdf"},
+  {num:"ГОСТ 2.302-68", name:"ЕСКД. Масштабы", cat:"Чертежи", status:"Действующий", desc:"Стандартные масштабы чертежей", file:"gost-2-302-68.pdf"},
+  {num:"ГОСТ 2.304-81", name:"ЕСКД. Шрифты чертёжные", cat:"Чертежи", status:"Действующий", desc:"Чертёжные шрифты", file:"gost-2-304-81.pdf"},
+  {num:"ГОСТ 5264-80", name:"Ручная дуговая сварка. Соединения сварные", cat:"Сварка", status:"Действующий", desc:"Типы и размеры сварных соединений", file:"gost-5264-80.pdf"},
+  {num:"ГОСТ 14771-76", name:"Дуговая сварка в защитном газе. Соединения сварные", cat:"Сварка", status:"Действующий", desc:"Сварка в защитном газе", file:"gost-14771-76.pdf"},
+  {num:"ГОСТ 1050-2013", name:"Металлопродукция из нелегированных конструкционных сталей", cat:"Материалы", status:"Действующий", desc:"Углеродистые конструкционные стали", file:"gost-1050-2013.pdf"},
+  {num:"ГОСТ 4543-2016", name:"Металлопродукция из легированной конструкционной стали", cat:"Материалы", status:"Действующий", desc:"Легированные конструкционные стали", file:"gost-4543-2016.pdf"},
+  {num:"ГОСТ 380-2005", name:"Сталь углеродистая обыкновенного качества", cat:"Материалы", status:"Действующий", desc:"Стали общего назначения", file:"gost-380-2005.pdf"},
+  {num:"ГОСТ 5632-2014", name:"Легированные нержавеющие стали и сплавы коррозионностойкие", cat:"Материалы", status:"Действующий", desc:"Нержавеющие и коррозионностойкие стали", file:"gost-5632-2014.pdf"},
+];
+// внешняя ссылка на бесплатный источник — генерируется автоматически из номера ГОСТа
+function gostExternalLink(num){
+  const slug = num.replace("ГОСТ ", "ГОСТ_").replace(/\s/g, "_");
+  return `https://standartgost.ru/g/${encodeURIComponent(slug)}`;
+}
+// ссылка на локальный файл в папке docs/ репозитория (появится, когда сам загрузишь PDF)
+function localFileLink(filename){
+  return `docs/${filename}`;
+}
+
+const materialsData = [
+  {grade:"Сталь 45", gost:"ГОСТ 1050-2013", chem:"C 0.42-0.50, Mn 0.5-0.8, Si 0.17-0.37", mech:"σв ≥ 600 МПа, HB 170-229", app:"Валы, шестерни, оси", analog:"AISI 1045, C45 (DIN)", file:"stal-45.pdf"},
+  {grade:"Сталь 40Х", gost:"ГОСТ 4543-2016", chem:"C 0.36-0.44, Cr 0.8-1.1, Mn 0.5-0.8", mech:"σв ≥ 980 МПа, HB 217-269", app:"Валы, оси, зубчатые колёса под нагрузкой", analog:"AISI 5140, 41Cr4 (DIN)", file:"stal-40h.pdf"},
+  {grade:"Сталь 20", gost:"ГОСТ 1050-2013", chem:"C 0.17-0.24, Mn 0.35-0.65", mech:"σв ≥ 410 МПа, HB 131-179", app:"Цементируемые детали, втулки", analog:"AISI 1020, C22 (DIN)", file:"stal-20.pdf"},
+  {grade:"Сталь 09Г2С", gost:"ГОСТ 19281-2014", chem:"C ≤0.12, Mn 1.3-1.7, Si 0.5-0.8", mech:"σв ≥ 450 МПа", app:"Сварные металлоконструкции, рамы", analog:"S355 (EN), A572 (ASTM)", file:"stal-09g2s.pdf"},
+  {grade:"Сталь 12Х18Н10Т", gost:"ГОСТ 5632-2014", chem:"C ≤0.12, Cr 17-19, Ni 9-11, Ti", mech:"σв ≥ 550 МПа", app:"Коррозионностойкие детали, пищевое оборудование", analog:"AISI 321, X6CrNiTi18-10", file:"stal-12h18n10t.pdf"},
+  {grade:"Сталь 65Г", gost:"ГОСТ 14959-2016", chem:"C 0.62-0.70, Mn 0.9-1.2", mech:"σв ≥ 1000 МПа (после закалки)", app:"Пружины, шайбы, режущий инструмент", analog:"AISI 1065, 65Mn (DIN)", file:"stal-65g.pdf"},
+];
+
+const literatureData = [
+  {src:"Анурьев В.И. Справочник конструктора-машиностроителя", vol:"Том 1", topic:"Общие сведения, материалы, допуски и посадки", pages:"1-920", content:"Марки сталей, чугунов, допуски, посадки, резьбы", file:"anuriev-tom1.pdf"},
+  {src:"Анурьев В.И. Справочник конструктора-машиностроителя", vol:"Том 2", topic:"Детали передач, подшипники, соединения", pages:"1-960", content:"Зубчатые, червячные, ремённые передачи, подшипники качения", file:"anuriev-tom2.pdf"},
+  {src:"Анурьев В.И. Справочник конструктора-машиностроителя", vol:"Том 3", topic:"Расчёт и конструирование деталей, узлов", pages:"1-864", content:"Валы, муфты, пружины, сварные и клеевые соединения", file:"anuriev-tom3.pdf"},
+];
+
+/* ============ RENDER: GOST ============ */
+function renderGost(){
+  const body = document.getElementById('gost-body');
+  const q = document.getElementById('gost-search').value.trim().toLowerCase();
+  const cat = document.getElementById('gost-cat').value;
+  const status = document.getElementById('gost-status').value;
+
+  const filtered = gostData.filter(g=>{
+    const matchesQ = !q || g.num.toLowerCase().includes(q) || g.name.toLowerCase().includes(q);
+    const matchesCat = !cat || g.cat === cat;
+    const matchesStatus = !status || g.status === status;
+    return matchesQ && matchesCat && matchesStatus;
+  });
+
+  document.getElementById('gost-count').textContent = `Найдено: ${filtered.length} из ${gostData.length}`;
+  document.getElementById('gost-empty').style.display = filtered.length ? 'none':'block';
+
+  body.innerHTML = filtered.map(g=>`
+    <tr>
+      <td style="font-family:var(--mono); white-space:nowrap; font-weight:600;">${g.num}</td>
+      <td>${g.name}</td>
+      <td><span class="tag">${g.cat}</span></td>
+      <td><span class="tag ${g.status==='Действующий'?'status-ok':'status-off'}">${g.status}</span></td>
+      <td style="color:#4c6577;">${g.desc}</td>
+      <td style="white-space:nowrap;">
+        <a class="doclink" href="${gostExternalLink(g.num)}" target="_blank" rel="noopener">Найти онлайн ↗</a><br>
+        <a class="doclink file" href="${localFileLink(g.file)}" target="_blank" rel="noopener">Мой файл</a>
+      </td>
+    </tr>
+  `).join('');
+}
+function populateGostFilters(){
+  const cats = [...new Set(gostData.map(g=>g.cat))];
+  const statuses = [...new Set(gostData.map(g=>g.status))];
+  const catSel = document.getElementById('gost-cat');
+  cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; catSel.appendChild(o); });
+  const statusSel = document.getElementById('gost-status');
+  statuses.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; statusSel.appendChild(o); });
+}
+document.getElementById('gost-search').addEventListener('input', renderGost);
+document.getElementById('gost-cat').addEventListener('change', renderGost);
+document.getElementById('gost-status').addEventListener('change', renderGost);
+populateGostFilters();
+renderGost();
+
+/* ============ RENDER: MATERIALS ============ */
+function renderMaterials(){
+  const body = document.getElementById('mat-body');
+  const q = document.getElementById('mat-search').value.trim().toLowerCase();
+  const filtered = materialsData.filter(m=>!q || m.grade.toLowerCase().includes(q) || m.gost.toLowerCase().includes(q));
+  document.getElementById('mat-count').textContent = `Найдено: ${filtered.length} из ${materialsData.length}`;
+  document.getElementById('mat-empty').style.display = filtered.length ? 'none':'block';
+  body.innerHTML = filtered.map(m=>`
+    <tr>
+      <td style="font-weight:700; white-space:nowrap;">${m.grade}</td>
+      <td style="font-family:var(--mono); font-size:12.5px; white-space:nowrap;">${m.gost}</td>
+      <td style="color:#4c6577; font-size:12.5px;">${m.chem}</td>
+      <td style="color:#4c6577; font-size:12.5px;">${m.mech}</td>
+      <td>${m.app}</td>
+      <td style="color:#4c6577; font-size:12.5px;">${m.analog}</td>
+      <td style="white-space:nowrap;"><a class="doclink file" href="${localFileLink(m.file)}" target="_blank" rel="noopener">Мой файл</a></td>
+    </tr>
+  `).join('');
+}
+document.getElementById('mat-search').addEventListener('input', renderMaterials);
+renderMaterials();
+
+/* ============ RENDER: LITERATURE ============ */
+function renderLit(){
+  const body = document.getElementById('lit-body');
+  const q = document.getElementById('lit-search').value.trim().toLowerCase();
+  const filtered = literatureData.filter(l=>!q || l.topic.toLowerCase().includes(q) || l.vol.toLowerCase().includes(q));
+  document.getElementById('lit-count').textContent = `Найдено: ${filtered.length} из ${literatureData.length}`;
+  document.getElementById('lit-empty').style.display = filtered.length ? 'none':'block';
+  body.innerHTML = filtered.map(l=>`
+    <tr>
+      <td>${l.src}</td>
+      <td style="font-family:var(--mono); white-space:nowrap;">${l.vol}</td>
+      <td>${l.topic}</td>
+      <td style="font-family:var(--mono); white-space:nowrap;">${l.pages}</td>
+      <td style="color:#4c6577;">${l.content}</td>
+      <td style="white-space:nowrap;"><a class="doclink file" href="${localFileLink(l.file)}" target="_blank" rel="noopener">Мой файл</a></td>
+    </tr>
+  `).join('');
+}
+document.getElementById('lit-search').addEventListener('input', renderLit);
+renderLit();
+
+/* ============ TOLERANCE CALCULATOR (reused) ============ */
+const sizeRanges = [
+  [1,3],[3,6],[6,10],[10,18],[18,30],[30,50],[50,80],[80,120],
+  [120,180],[180,250],[250,315],[315,400],[400,500]
+];
+const itTable = {
+  "1-3":   {5:4,6:6,7:10,8:14,9:25,10:40,11:60},
+  "3-6":   {5:5,6:8,7:12,8:18,9:30,10:48,11:75},
+  "6-10":  {5:6,6:9,7:15,8:22,9:36,10:58,11:90},
+  "10-18": {5:8,6:11,7:18,8:27,9:43,10:70,11:110},
+  "18-30": {5:9,6:13,7:21,8:33,9:52,10:84,11:130},
+  "30-50": {5:11,6:16,7:25,8:39,9:62,10:100,11:160},
+  "50-80": {5:13,6:19,7:30,8:46,9:74,10:120,11:190},
+  "80-120":{5:15,6:22,7:35,8:54,9:87,10:140,11:220},
+  "120-180":{5:18,6:25,7:40,8:63,9:100,10:160,11:250},
+  "180-250":{5:20,6:29,7:46,8:72,9:115,10:185,11:290},
+  "250-315":{5:23,6:32,7:52,8:81,9:130,10:210,11:320},
+  "315-400":{5:25,6:36,7:57,8:89,9:140,10:230,11:360},
+  "400-500":{5:27,6:40,7:63,8:97,9:155,10:250,11:400}
+};
+const esBelowH = {
+  "1-3":   {d:-20,  e:-14,  f:-6,  g:-2},
+  "3-6":   {d:-30,  e:-20,  f:-10, g:-4},
+  "6-10":  {d:-40,  e:-25,  f:-13, g:-5},
+  "10-18": {d:-50,  e:-32,  f:-16, g:-6},
+  "18-30": {d:-65,  e:-40,  f:-20, g:-7},
+  "30-50": {d:-80,  e:-50,  f:-25, g:-9},
+  "50-80": {d:-100, e:-60,  f:-30, g:-10},
+  "80-120":{d:-120, e:-72,  f:-36, g:-12},
+  "120-180":{d:-145,e:-85,  f:-43, g:-14},
+  "180-250":{d:-170,e:-100, f:-50, g:-15},
+  "250-315":{d:-190,e:-110, f:-56, g:-17},
+  "315-400":{d:-210,e:-125, f:-62, g:-18},
+  "400-500":{d:-230,e:-135, f:-68, g:-20}
+};
+const eiAboveH = {
+  "1-3":   {k:0,  m:2,  n:4,  p:6,  r:10, s:14},
+  "3-6":   {k:1,  m:4,  n:8,  p:12, r:15, s:19},
+  "6-10":  {k:1,  m:6,  n:10, p:15, r:19, s:23},
+  "10-18": {k:1,  m:7,  n:12, p:18, r:23, s:28},
+  "18-30": {k:2,  m:8,  n:15, p:22, r:28, s:35},
+  "30-50": {k:2,  m:9,  n:17, p:26, r:34, s:43},
+  "50-80": {k:2,  m:11, n:20, p:32, r:41, s:53},
+  "80-120":{k:3,  m:13, n:23, p:37, r:49, s:59},
+  "120-180":{k:3, m:15, n:27, p:43, r:58, s:71},
+  "180-250":{k:4, m:17, n:31, p:50, r:68, s:79},
+  "250-315":{k:4, m:20, n:34, p:56, r:79, s:88},
+  "315-400":{k:4, m:21, n:37, p:62, r:88, s:98},
+  "400-500":{k:5, m:23, n:40, p:68, r:98, s:108}
+};
+const letters = ["d","e","f","g","h","js","k","m","n","p","r","s"];
+const letterNames = {
+  d:"d — ходовая с зазором", e:"e — ходовая с зазором", f:"f — лёгкоходовая",
+  g:"g — скользящая", h:"h — базовый вал / базовое отверстие",
+  js:"js — симметричная (переходная)", k:"k — переходная (плотная)",
+  m:"m — переходная (тугая)", n:"n — лёгкий натяг", p:"p — натяг",
+  r:"r — средний натяг", s:"s — плотный натяг"
+};
+const letterSel = document.getElementById("letter");
+letters.forEach(l=>{
+  const o = document.createElement("option");
+  o.value = l; o.textContent = letterNames[l];
+  if(l==="h") o.selected = true;
+  letterSel.appendChild(o);
+});
+const gradeSel = document.getElementById("grade");
+[5,6,7,8,9,10,11].forEach(g=>{
+  const o = document.createElement("option");
+  o.value = g; o.textContent = "IT"+g;
+  if(g===7) o.selected = true;
+  gradeSel.appendChild(o);
+});
+let isHole = false;
+const btnShaft = document.getElementById("btn-shaft");
+const btnHole = document.getElementById("btn-hole");
+btnShaft.onclick = ()=>{ isHole=false; btnShaft.classList.add("active"); btnHole.classList.remove("active"); render(); };
+btnHole.onclick = ()=>{ isHole=true; btnHole.classList.add("active"); btnShaft.classList.remove("active"); render(); };
+
+function findRangeKey(size){
+  for(const [a,b] of sizeRanges){ if(size > a && size <= b) return a+"-"+b; }
+  if(size <= 1) return "1-3";
+  return null;
+}
+function compute(size, letter, grade){
+  const key = findRangeKey(size);
+  if(!key) return {error:"Размер вне справочного диапазона (1–500 мм)."};
+  const IT = itTable[key][grade];
+  if(IT === undefined) return {error:"Нет данных для этого квалитета в данном диапазоне."};
+  let upper, lower;
+  const L = letter.toLowerCase();
+  if(L === "h"){ upper = 0; lower = -IT; }
+  else if(L === "js"){ upper = IT/2; lower = -IT/2; }
+  else if(["d","e","f","g"].includes(L)){
+    const es = esBelowH[key][L];
+    if(es === undefined) return {error:"Нет данных для этого поля в данном диапазоне."};
+    upper = es; lower = es - IT;
+  } else if(["k","m","n","p","r","s"].includes(L)){
+    if(L === "k" && grade > 8) { upper = IT; lower = 0; }
+    else {
+      const ei = eiAboveH[key][L];
+      if(ei === undefined) return {error:"Нет данных для этого поля в данном диапазоне."};
+      lower = ei; upper = ei + IT;
+    }
+  } else { return {error:"Поле не поддерживается калькулятором."}; }
+  if(isHole){ return {IT, upper: -lower, lower: -upper, key}; }
+  return {IT, upper, lower, key};
+}
+function round1(v){ return Math.round(v*10)/10; }
+function diagram(res){
+  const range = Math.max(Math.abs(res.upper), Math.abs(res.lower), 1) * 1.4;
+  const pxPerUnit = 45 / range;
+  const top = 60 - res.upper*pxPerUnit;
+  const bottom = 60 - res.lower*pxPerUnit;
+  const barTop = Math.min(top,bottom);
+  const barH = Math.max(Math.abs(bottom-top), 2);
+  return `
+    <div class="diagram">
+      <div class="zero-line"></div>
+      <div class="zero-label">0</div>
+      <div class="bar" style="top:${barTop}px; height:${barH}px;"></div>
+      <div class="bar-label" style="left:42%; top:${barTop-16}px;">${res.upper>0?'+':''}${round1(res.upper)}</div>
+      <div class="bar-label" style="left:42%; top:${barTop+barH+4}px;">${res.lower>0?'+':''}${round1(res.lower)}</div>
+    </div>
+  `;
+}
+function render(){
+  const size = parseFloat(document.getElementById("size").value) || 0;
+  const letter = letterSel.value;
+  const grade = parseInt(gradeSel.value, 10);
+  const out = document.getElementById("output");
+  const res = compute(size, letter, grade);
+  const symbol = (isHole ? letter.toUpperCase() : letter) + grade;
+  if(res.error){ out.innerHTML = `<div class="missing">⚠ ${res.error}</div>`; return; }
+  const maxSize = size + res.upper/1000;
+  const minSize = size + res.lower/1000;
+  out.innerHTML = `
+    <div class="result">
+      <div class="result-grid">
+        <div class="stat hi"><div class="k">Обозначение</div><div class="v">⌀${size} ${symbol}</div></div>
+        <div class="stat"><div class="k">Верхнее откл. ES/es</div><div class="v">${res.upper>0?'+':''}${round1(res.upper)} мкм</div></div>
+        <div class="stat"><div class="k">Нижнее откл. EI/ei</div><div class="v">${res.lower>0?'+':''}${round1(res.lower)} мкм</div></div>
+        <div class="stat"><div class="k">Допуск IT</div><div class="v">${res.IT} мкм</div></div>
+      </div>
+      <div class="result-grid" style="margin-top:12px;">
+        <div class="stat"><div class="k">Наибольший предельный размер</div><div class="v">${maxSize.toFixed(3)} мм</div></div>
+        <div class="stat"><div class="k">Наименьший предельный размер</div><div class="v">${minSize.toFixed(3)} мм</div></div>
+      </div>
+      ${diagram(res)}
+      <div class="note warn">Диапазон размеров: св. ${res.key.replace('-', ' до ')} мм. Значения справочные — сверяй с ГОСТ 25347-2013 для ответственных применений.</div>
+    </div>
+  `;
+}
+document.getElementById("size").addEventListener("input", render);
+letterSel.addEventListener("change", render);
+gradeSel.addEventListener("change", render);
+render();
+
+/* IT table render */
+function renderITTable(){
+  const grades = [5,6,7,8,9,10,11];
+  let html = '<thead><tr><th>Диапазон, мм</th>' + grades.map(g=>`<th>IT${g}</th>`).join('') + '</tr></thead><tbody>';
+  sizeRanges.forEach(([a,b])=>{
+    const key = a+"-"+b;
+    html += `<tr><td style="font-family:var(--mono); white-space:nowrap;">св. ${a} до ${b}</td>` +
+      grades.map(g=>`<td>${itTable[key][g]}</td>`).join('') + '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('it-table').innerHTML = html;
+}
+renderITTable();
+</script>
+</body>
+</html>
