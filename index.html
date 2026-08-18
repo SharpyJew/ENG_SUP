@@ -525,14 +525,29 @@
 
     <div class="panel" style="margin-top:20px;">
       <h2 style="color:var(--ink);">Полная таблица размеров</h2>
+      <p style="color:#4c6577; font-size:13px; margin-top:2px;">Ищи по обозначению или сразу по посадочным размерам — внутренний d, наружный D, ширина/высота h — если знаешь их с чертежа или со старого подшипника.</p>
       <div class="toolbar" style="margin-top:12px;">
         <input class="search" id="bearings-search" placeholder="Поиск по обозначению…">
         <select class="filter" id="bearings-type"><option value="">Все типы</option></select>
       </div>
-      <div class="count" id="bearings-count"></div>
+      <div class="row" style="margin-top:12px;">
+        <div class="field">
+          <label for="bearings-filter-d">d — внутр. диаметр, мм</label>
+          <input type="number" id="bearings-filter-d" min="0" step="1" placeholder="любой">
+        </div>
+        <div class="field">
+          <label for="bearings-filter-D">D — наружн. диаметр, мм</label>
+          <input type="number" id="bearings-filter-D" min="0" step="1" placeholder="любой">
+        </div>
+        <div class="field">
+          <label for="bearings-filter-h">h — ширина/высота, мм</label>
+          <input type="number" id="bearings-filter-h" min="0" step="0.1" placeholder="любой">
+        </div>
+      </div>
+      <div class="count" id="bearings-count" style="margin-top:12px;"></div>
       <div style="overflow-x:auto;">
         <table>
-          <thead><tr><th></th><th>Обозначение</th><th>Тип</th><th>d, мм</th><th>D, мм</th><th>B/T, мм</th><th>Cr дин., кН</th><th>C0r стат., кН</th><th></th></tr></thead>
+          <thead><tr><th></th><th>Обозначение</th><th>Тип</th><th>d — вал, мм</th><th>D — корпус, мм</th><th>h — ширина, мм</th><th>Cr дин., кН</th><th>C0r стат., кН</th><th></th></tr></thead>
           <tbody id="bearings-body"></tbody>
         </table>
       </div>
@@ -1178,10 +1193,16 @@ function renderBearings(){
   const body = document.getElementById('bearings-body');
   const q = document.getElementById('bearings-search').value.trim().toLowerCase();
   const type = document.getElementById('bearings-type').value;
+  const fd = document.getElementById('bearings-filter-d').value;
+  const fD = document.getElementById('bearings-filter-D').value;
+  const fh = document.getElementById('bearings-filter-h').value;
   const filtered = bearingsData.map((b,i)=>({...b,_i:i})).filter(b=>{
     const matchesQ = !q || b.code.toLowerCase().includes(q);
     const matchesType = !type || b.type === type;
-    return matchesQ && matchesType;
+    const matchesD_in = fd === '' || b.d === parseFloat(fd);
+    const matchesD_out = fD === '' || b.D === parseFloat(fD);
+    const matchesH = fh === '' || b.B === parseFloat(fh);
+    return matchesQ && matchesType && matchesD_in && matchesD_out && matchesH;
   });
   document.getElementById('bearings-count').textContent = `Найдено: ${filtered.length} из ${bearingsData.length}`;
   document.getElementById('bearings-empty').style.display = filtered.length ? 'none':'block';
@@ -1206,6 +1227,9 @@ function populateBearingsFilters(){
 }
 document.getElementById('bearings-search').addEventListener('input', renderBearings);
 document.getElementById('bearings-type').addEventListener('change', renderBearings);
+document.getElementById('bearings-filter-d').addEventListener('input', renderBearings);
+document.getElementById('bearings-filter-D').addEventListener('input', renderBearings);
+document.getElementById('bearings-filter-h').addEventListener('input', renderBearings);
 populateBearingsFilters();
 favRenderMap.bearings = renderBearings;
 renderBearings();
