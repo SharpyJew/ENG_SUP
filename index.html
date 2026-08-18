@@ -496,9 +496,36 @@
   <section id="page-bearings" class="page">
     <div class="eyebrow">Раздел 07 · ISO 15 / ISO 104 / ГОСТ 8338-75</div>
     <h1>Подшипники качения</h1>
-    <p class="sub">Стандартные размеры ISO — по ним делают все производители, включая SKF, поэтому подшипник с этими d/D/B взаимозаменяем независимо от бренда. Грузоподъёмность — ориентировочная, для точного подбора сверяйся с каталогом производителя.</p>
+    <p class="sub">Стандартные размеры ISO — по ним делают все производители, включая SKF, поэтому подшипник с этими d/D/B взаимозаменяем независимо от бренда.</p>
+
     <div class="panel">
-      <div class="toolbar">
+      <h2 style="color:var(--ink);">Подбор по нагрузке и ресурсу</h2>
+      <p style="color:#4c6577; font-size:13px; margin-top:2px;">Диаметр вала, радиальная нагрузка, обороты и желаемый ресурс — калькулятор посчитает реальный ресурс L10h для каждого подшипника с этим посадочным диаметром и подсветит те, кто проходит по запасу.</p>
+      <div class="row" style="margin-top:16px;">
+        <div class="field">
+          <label for="pick-d">Диаметр вала d, мм</label>
+          <input type="number" id="pick-d" min="1" step="1" value="20">
+        </div>
+        <div class="field">
+          <label for="pick-fr">Радиальная нагрузка Fr, Н</label>
+          <input type="number" id="pick-fr" min="0" step="10" value="2000">
+        </div>
+        <div class="field">
+          <label for="pick-n">Частота вращения n, об/мин</label>
+          <input type="number" id="pick-n" min="0" step="10" value="1500">
+        </div>
+        <div class="field">
+          <label for="pick-life">Нужный ресурс L10h, часов</label>
+          <input type="number" id="pick-life" min="1" step="100" value="10000">
+        </div>
+      </div>
+      <div id="pick-output" style="margin-top:20px;"></div>
+      <div class="note">Расчёт для чистой радиальной нагрузки (P = Fr). При заметной осевой нагрузке нужна эквивалентная динамическая нагрузка P = X·Fr + Y·Fa по каталогу производителя — здесь это не учтено, так что для смешанной нагрузки запас занижай вручную.</div>
+    </div>
+
+    <div class="panel" style="margin-top:20px;">
+      <h2 style="color:var(--ink);">Полная таблица размеров</h2>
+      <div class="toolbar" style="margin-top:12px;">
         <input class="search" id="bearings-search" placeholder="Поиск по обозначению…">
         <select class="filter" id="bearings-type"><option value="">Все типы</option></select>
       </div>
@@ -1029,6 +1056,7 @@ function toggleFav(page, id){
   favs = favs.includes(k) ? favs.filter(f=>f!==k) : [...favs, k];
   localStorage.setItem('eng_favorites', JSON.stringify(favs));
   if(favRenderMap[page]) favRenderMap[page]();
+  if(page === 'bearings' && typeof computeBearingPick === 'function') computeBearingPick();
   renderFavorites();
 }
 document.addEventListener('click', e=>{
@@ -1181,6 +1209,52 @@ document.getElementById('bearings-type').addEventListener('change', renderBearin
 populateBearingsFilters();
 favRenderMap.bearings = renderBearings;
 renderBearings();
+
+/* ============ BEARING SELECTION (load + life) ============ */
+function computeBearingPick(){
+  const d = parseFloat(document.getElementById('pick-d').value) || 0;
+  const Fr = parseFloat(document.getElementById('pick-fr').value) || 0;
+  const n = parseFloat(document.getElementById('pick-n').value) || 0;
+  const wantLife = parseFloat(document.getElementById('pick-life').value) || 0;
+  const out = document.getElementById('pick-output');
+  const candidates = bearingsData.map((b,i)=>({...b,_i:i})).filter(b=>b.d === d);
+  if(!candidates.length){
+    const available = [...new Set(bearingsData.map(b=>b.d))].sort((a,b2)=>a-b2).join(', ');
+    out.innerHTML = `<div class="missing">⚠ В таблице нет подшипников с посадочным диаметром ${d} мм. Доступные диаметры: ${available} мм.</div>`;
+    return;
+  }
+  const rows = candidates.map(b=>{
+    const p = b.type === 'Роликовый конический' ? 10/3 : 3;
+    const CrN = b.Cr * 1000;
+    const lifeMillionRev = Fr > 0 ? Math.pow(CrN / Fr, p) : Infinity;
+    const lifeHours = (n > 0 && Fr > 0) ? lifeMillionRev * 1e6 / (60 * n) : Infinity;
+    const passes = lifeHours >= wantLife;
+    return {...b, lifeHours, passes};
+  }).sort((a,b)=>a.D - b.D);
+  out.innerHTML = `
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th></th><th>Обозначение</th><th>Тип</th><th>D, мм</th><th>B/T, мм</th><th>Cr, кН</th><th>Ресурс L10h, ч</th><th>Запас</th></tr></thead>
+        <tbody>
+          ${rows.map(b=>`
+            <tr style="${b.passes ? '' : 'opacity:.5;'}">
+              <td class="star-cell"><button class="star ${isFav('bearings',b._i)?'on':''}" data-page="bearings" data-id="${b._i}">${isFav('bearings',b._i)?'★':'☆'}</button></td>
+              <td style="font-family:var(--mono); font-weight:700;">${b.code}</td>
+              <td><span class="tag">${b.type}</span></td>
+              <td>${b.D}</td>
+              <td>${b.B}</td>
+              <td>${b.Cr}</td>
+              <td style="font-family:var(--mono);">${b.lifeHours === Infinity ? '∞' : Math.round(b.lifeHours).toLocaleString('ru-RU')}</td>
+              <td><span class="tag ${b.passes ? 'status-ok' : 'status-off'}">${b.passes ? 'подходит' : 'мало'}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+['pick-d','pick-fr','pick-n','pick-life'].forEach(id=>document.getElementById(id).addEventListener('input', computeBearingPick));
+computeBearingPick();
 
 /* ============ DATA: SORTAMENT ============ */
 const sortamentData = [
