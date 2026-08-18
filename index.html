@@ -436,7 +436,57 @@
     <div class="eyebrow">Раздел 04</div>
     <h1>Литература</h1>
     <p class="sub">Анурьев и другие справочники — оглавление томов и ключевые таблицы.</p>
+
     <div class="panel">
+      <h2 style="color:var(--ink);">Добавить источник</h2>
+      <p style="color:#4c6577; font-size:13px; margin-top:2px;">Заполни поля — ниже сама соберётся строка кода. Дальше: залей PDF в <code>docs/</code> на GitHub и вставь эту строку в список источников в index.html (как именно — под спойлером ниже).</p>
+      <div class="row" style="margin-top:16px;">
+        <div class="field">
+          <label for="lit-add-src">Источник (автор, название)</label>
+          <input type="text" id="lit-add-src" placeholder="Иванов И.И. Справочник по деталям машин">
+        </div>
+        <div class="field">
+          <label for="lit-add-vol">Том / раздел</label>
+          <input type="text" id="lit-add-vol" placeholder="Том 1">
+        </div>
+      </div>
+      <div class="row" style="margin-top:16px;">
+        <div class="field">
+          <label for="lit-add-topic">Тема</label>
+          <input type="text" id="lit-add-topic" placeholder="Например: подшипники и муфты">
+        </div>
+        <div class="field">
+          <label for="lit-add-pages">Страницы</label>
+          <input type="text" id="lit-add-pages" placeholder="1-200">
+        </div>
+      </div>
+      <div class="row" style="margin-top:16px;">
+        <div class="field">
+          <label for="lit-add-content">Содержание (коротко)</label>
+          <input type="text" id="lit-add-content" placeholder="Что внутри">
+        </div>
+        <div class="field">
+          <label for="lit-add-file">Имя файла в docs/ (латиницей)</label>
+          <input type="text" id="lit-add-file" placeholder="ivanov-spravochnik.pdf">
+        </div>
+      </div>
+      <div style="margin-top:20px;">
+        <label for="lit-add-output">Готовая строка для вставки</label>
+        <textarea id="lit-add-output" readonly rows="2" style="width:100%; font-family:var(--mono); font-size:12.5px; padding:10px 12px; border:1.5px solid var(--paper-line); border-radius:3px; background:#fff; color:var(--ink); resize:vertical;"></textarea>
+        <button id="lit-add-copy" type="button" style="margin-top:10px; font-family:var(--mono); font-size:12.5px; padding:9px 16px; border:1.5px solid var(--blueprint); background:var(--blueprint); color:#fff; border-radius:3px; cursor:pointer;">Скопировать строку</button>
+        <span id="lit-add-copied" style="margin-left:10px; font-family:var(--mono); font-size:12px; color:var(--ok); display:none;">Скопировано ✓</span>
+      </div>
+      <details class="howto" style="margin-top:20px;">
+        <summary>Как залить файл и вставить строку на GitHub</summary>
+        <div style="margin-top:10px;">
+          1. Открой <a class="doclink" href="https://github.com/SharpyJew/ENG_SUP/upload/main/docs" target="_blank" rel="noopener">загрузку файлов в docs/ ↗</a>, перетащи туда PDF с именем, которое указал(а) выше в поле «Имя файла», внизу нажми Commit changes.<br>
+          2. Открой <a class="doclink" href="https://github.com/SharpyJew/ENG_SUP/edit/main/index.html" target="_blank" rel="noopener">редактирование index.html ↗</a>, найди в коде строку <code>const literatureData = [</code> и вставь скопированную строку сразу после неё (просто новая строка, ничего больше не трогай).<br>
+          3. Прокрути вниз, нажми Commit changes. Сайт обновится сам через 1-2 минуты.
+        </div>
+      </details>
+    </div>
+
+    <div class="panel" style="margin-top:20px;">
       <div class="toolbar">
         <input class="search" id="lit-search" placeholder="Поиск по теме или разделу…">
       </div>
@@ -886,6 +936,38 @@ function renderLit(){
 }
 document.getElementById('lit-search').addEventListener('input', renderLit);
 renderLit();
+
+/* ============ LITERATURE ENTRY GENERATOR (no token, copy-paste) ============ */
+function jsEscape(str){ return String(str).replace(/\\/g,'\\\\').replace(/"/g,'\\"'); }
+function updateLitAddOutput(){
+  const src = document.getElementById('lit-add-src').value.trim();
+  const vol = document.getElementById('lit-add-vol').value.trim();
+  const topic = document.getElementById('lit-add-topic').value.trim();
+  const pages = document.getElementById('lit-add-pages').value.trim();
+  const content = document.getElementById('lit-add-content').value.trim();
+  const file = document.getElementById('lit-add-file').value.trim();
+  document.getElementById('lit-add-output').value =
+    `  {src:"${jsEscape(src)}", vol:"${jsEscape(vol)}", topic:"${jsEscape(topic)}", pages:"${jsEscape(pages)}", content:"${jsEscape(content)}", file:"${jsEscape(file)}"},`;
+}
+['lit-add-src','lit-add-vol','lit-add-topic','lit-add-pages','lit-add-content','lit-add-file'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', updateLitAddOutput);
+});
+updateLitAddOutput();
+document.getElementById('lit-add-copy').addEventListener('click', ()=>{
+  const ta = document.getElementById('lit-add-output');
+  ta.select();
+  const showCopied = ()=>{
+    const badge = document.getElementById('lit-add-copied');
+    badge.style.display = 'inline';
+    setTimeout(()=>{ badge.style.display = 'none'; }, 2000);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(ta.value).then(showCopied).catch(()=>{ document.execCommand('copy'); showCopied(); });
+  } else {
+    document.execCommand('copy');
+    showCopied();
+  }
+});
 
 /* ============ TOLERANCE CALCULATOR (reused) ============ */
 const sizeRanges = [
