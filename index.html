@@ -177,6 +177,44 @@
   @media (max-width: 640px){
     .brand{ margin-right:8px; }
   }
+
+  /* --- favorites / star --- */
+  .star{
+    background:transparent; border:none; cursor:pointer; font-size:16px; color:#c9963d;
+    padding:0 4px; line-height:1;
+  }
+  .star.on{ color:var(--accent); }
+  .star-cell{ width:30px; text-align:center; }
+  .fav-row{
+    display:flex; align-items:center; gap:10px; padding:12px 6px; border-bottom:1px solid var(--paper-line);
+  }
+  .fav-title{ font-size:13.5px; }
+
+  /* --- global search --- */
+  .search-wrap{ position:relative; margin-left:auto; }
+  .global-search{
+    font-family:var(--mono); font-size:12.5px; padding:8px 10px; border:1px solid var(--blueprint-line);
+    border-radius:3px; background:rgba(255,255,255,.08); color:#fff; width:190px;
+  }
+  .global-search::placeholder{ color:#9fc4dd; }
+  .global-search:focus{ outline:none; border-color:var(--accent); background:#fff; color:var(--ink); }
+  .gs-results{
+    position:absolute; top:calc(100% + 8px); right:0; width:360px; max-height:420px; overflow-y:auto;
+    background:var(--paper); color:var(--ink); border:1px solid var(--paper-line); border-radius:4px;
+    box-shadow:0 12px 30px rgba(0,0,0,.35); z-index:100; display:none;
+  }
+  .gs-results.show{ display:block; }
+  .gs-group{ padding:9px 12px 3px; font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:#7488a3; }
+  .gs-item{ padding:8px 12px; cursor:pointer; font-size:13px; border-top:1px solid var(--paper-line); }
+  .gs-item:hover{ background:#e4ecf1; }
+  .gs-item .t{ font-weight:600; }
+  .gs-item .d{ font-size:11.5px; color:#4c6577; }
+  .gs-empty{ padding:16px; text-align:center; color:#7488a3; font-family:var(--mono); font-size:12px; }
+
+  @media (max-width: 900px){
+    .search-wrap{ margin-left:0; width:100%; }
+    .global-search{ width:100%; }
+  }
 </style>
 </head>
 <body>
@@ -187,10 +225,22 @@
     <nav id="nav">
       <button data-page="home" class="active">Главная</button>
       <button data-page="gost">ГОСТы</button>
+      <button data-page="threads">Резьбы</button>
+      <button data-page="fasteners">Крепёж</button>
       <button data-page="tolerances">Допуски и посадки</button>
+      <button data-page="bearings">Подшипники</button>
       <button data-page="materials">Материалы</button>
+      <button data-page="sortament">Сортамент</button>
+      <button data-page="hardness">Твёрдость</button>
+      <button data-page="roughness">Шероховатость</button>
+      <button data-page="mass">Расчёт массы</button>
       <button data-page="literature">Анурьев / Литература</button>
+      <button data-page="favorites">★ Избранное</button>
     </nav>
+    <div class="search-wrap">
+      <input class="global-search" id="global-search" placeholder="Поиск по всей базе…" autocomplete="off">
+      <div class="gs-results" id="gs-results"></div>
+    </div>
   </div>
 </div>
 
@@ -207,20 +257,60 @@
         <h3>ГОСТы / Стандарты</h3>
         <p>Резьбы, допуски, чертежи, сварка, материалы — с фильтром по категории и статусу.</p>
       </div>
-      <div class="card" onclick="showPage('tolerances')">
+      <div class="card" onclick="showPage('threads')">
         <div class="num">02</div>
+        <h3>Резьбы</h3>
+        <p>Метрическая резьба: шаг, диаметр сверла под резьбу, площадь сечения.</p>
+      </div>
+      <div class="card" onclick="showPage('fasteners')">
+        <div class="num">03</div>
+        <h3>Крепёж</h3>
+        <p>Болты/гайки: размер ключа, высота гайки, диаметр шайбы.</p>
+      </div>
+      <div class="card" onclick="showPage('tolerances')">
+        <div class="num">04</div>
         <h3>Допуски и посадки</h3>
         <p>Калькулятор полей допусков + справочные таблицы IT-квалитетов.</p>
       </div>
+      <div class="card" onclick="showPage('bearings')">
+        <div class="num">05</div>
+        <h3>Подшипники</h3>
+        <p>Серии 6000/6200: посадочные размеры, грузоподъёмность.</p>
+      </div>
       <div class="card" onclick="showPage('materials')">
-        <div class="num">03</div>
+        <div class="num">06</div>
         <h3>Материалы</h3>
         <p>Стали и сплавы: химсостав, механические свойства, зарубежные аналоги.</p>
       </div>
+      <div class="card" onclick="showPage('sortament')">
+        <div class="num">07</div>
+        <h3>Сортамент проката</h3>
+        <p>Уголок, швеллер, труба, лист — вес погонного метра.</p>
+      </div>
+      <div class="card" onclick="showPage('hardness')">
+        <div class="num">08</div>
+        <h3>Твёрдость</h3>
+        <p>Перевод HB ↔ HRC ↔ HV ↔ предел прочности.</p>
+      </div>
+      <div class="card" onclick="showPage('roughness')">
+        <div class="num">09</div>
+        <h3>Шероховатость</h3>
+        <p>Ra ↔ Rz и типичные методы обработки поверхности.</p>
+      </div>
+      <div class="card" onclick="showPage('mass')">
+        <div class="num">10</div>
+        <h3>Расчёт массы</h3>
+        <p>Масса круга, квадрата, шестигранника, трубы, листа по материалу.</p>
+      </div>
       <div class="card" onclick="showPage('literature')">
-        <div class="num">04</div>
+        <div class="num">11</div>
         <h3>Анурьев / Литература</h3>
         <p>Оглавление и ключевые таблицы справочника конструктора.</p>
+      </div>
+      <div class="card" onclick="showPage('favorites')">
+        <div class="num">★</div>
+        <h3>Избранное</h3>
+        <p>Всё, что ты закрепил звёздочкой — в одном списке.</p>
       </div>
     </div>
 
@@ -260,7 +350,7 @@
       <div class="count" id="gost-count"></div>
       <div style="overflow-x:auto;">
         <table>
-          <thead><tr><th>Номер</th><th>Название</th><th>Категория</th><th>Статус</th><th>Описание</th><th>Ссылки</th></tr></thead>
+          <thead><tr><th></th><th>Номер</th><th>Название</th><th>Категория</th><th>Статус</th><th>Описание</th><th>Ссылки</th></tr></thead>
           <tbody id="gost-body"></tbody>
         </table>
       </div>
@@ -320,7 +410,7 @@
       <div class="count" id="mat-count"></div>
       <div style="overflow-x:auto;">
         <table>
-          <thead><tr><th>Марка</th><th>ГОСТ</th><th>Химсостав</th><th>Мех. свойства</th><th>Применение</th><th>Аналоги</th><th>Файл</th></tr></thead>
+          <thead><tr><th></th><th>Марка</th><th>ГОСТ</th><th>Химсостав</th><th>Мех. свойства</th><th>Применение</th><th>Аналоги</th><th>Файл</th></tr></thead>
           <tbody id="mat-body"></tbody>
         </table>
       </div>
@@ -340,11 +430,160 @@
       <div class="count" id="lit-count"></div>
       <div style="overflow-x:auto;">
         <table>
-          <thead><tr><th>Источник</th><th>Том/раздел</th><th>Тема</th><th>Страницы</th><th>Содержание</th><th>Файл</th></tr></thead>
+          <thead><tr><th></th><th>Источник</th><th>Том/раздел</th><th>Тема</th><th>Страницы</th><th>Содержание</th><th>Файл</th></tr></thead>
           <tbody id="lit-body"></tbody>
         </table>
       </div>
       <div class="empty" id="lit-empty" style="display:none;">Ничего не найдено</div>
+    </div>
+  </section>
+
+  <!-- THREADS -->
+  <section id="page-threads" class="page">
+    <div class="eyebrow">Раздел 05 · ГОСТ 24705-2004 / ГОСТ 9150-2002</div>
+    <h1>Резьбы метрические</h1>
+    <p class="sub">Шаг крупный/мелкий, диаметр сверла под резьбу, площадь сечения по внутреннему диаметру (для проверки на растяжение).</p>
+    <div class="panel">
+      <div class="toolbar">
+        <input class="search" id="threads-search" placeholder="Поиск по обозначению…">
+      </div>
+      <div class="count" id="threads-count"></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th></th><th>Обозначение</th><th>Шаг крупный, мм</th><th>Шаг мелкий, мм</th><th>Сверло под резьбу, мм</th><th>Площадь сечения, мм²</th></tr></thead>
+          <tbody id="threads-body"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="threads-empty" style="display:none;">Ничего не найдено</div>
+      <div class="note">Диаметр сверла — под метчик для крупного шага, глубина сверления обычно ≥ 1.25×длина резьбы. Площадь сечения — по внутреннему диаметру, справочно для прикидочного расчёта на разрыв.</div>
+    </div>
+  </section>
+
+  <!-- FASTENERS -->
+  <section id="page-fasteners" class="page">
+    <div class="eyebrow">Раздел 06 · DIN 931 / ГОСТ 7798-70</div>
+    <h1>Крепёж — болты и гайки</h1>
+    <p class="sub">Размер ключа «под шестигранник», высота гайки, номинальный диаметр шайбы.</p>
+    <div class="panel">
+      <div class="toolbar">
+        <input class="search" id="fasteners-search" placeholder="Поиск по обозначению…">
+      </div>
+      <div class="count" id="fasteners-count"></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th></th><th>Резьба</th><th>Ключ, мм</th><th>Высота гайки, мм</th><th>Шайба (нар. Ø), мм</th></tr></thead>
+          <tbody id="fasteners-body"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="fasteners-empty" style="display:none;">Ничего не найдено</div>
+    </div>
+  </section>
+
+  <!-- BEARINGS -->
+  <section id="page-bearings" class="page">
+    <div class="eyebrow">Раздел 07 · ISO 15 / ГОСТ 8338-75</div>
+    <h1>Подшипники качения — шариковые радиальные</h1>
+    <p class="sub">Серии 6000 (лёгкая) и 6200 (средняя): посадочные размеры и грузоподъёмность.</p>
+    <div class="panel">
+      <div class="toolbar">
+        <input class="search" id="bearings-search" placeholder="Поиск по обозначению…">
+      </div>
+      <div class="count" id="bearings-count"></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th></th><th>Обозначение</th><th>d, мм</th><th>D, мм</th><th>B, мм</th><th>Cr дин., кН</th><th>C0r стат., кН</th></tr></thead>
+          <tbody id="bearings-body"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="bearings-empty" style="display:none;">Ничего не найдено</div>
+    </div>
+  </section>
+
+  <!-- SORTAMENT -->
+  <section id="page-sortament" class="page">
+    <div class="eyebrow">Раздел 08 · ГОСТ 8509-93 / ГОСТ 8240-97 / ГОСТ 10704-91 / ГОСТ 19903-2015</div>
+    <h1>Сортамент проката</h1>
+    <p class="sub">Уголок равнополочный, швеллер, труба электросварная, лист горячекатаный — масса погонного метра (для листа — кг/м²).</p>
+    <div class="panel">
+      <div class="toolbar">
+        <input class="search" id="sortament-search" placeholder="Поиск по типу или размеру…">
+      </div>
+      <div class="count" id="sortament-count"></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th></th><th>Профиль</th><th>Размер</th><th>Масса, кг/м</th><th>ГОСТ</th></tr></thead>
+          <tbody id="sortament-body"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="sortament-empty" style="display:none;">Ничего не найдено</div>
+    </div>
+  </section>
+
+  <!-- HARDNESS -->
+  <section id="page-hardness" class="page">
+    <div class="eyebrow">Раздел 09 · приближённо, аналог ASTM E140 / ГОСТ 22761</div>
+    <h1>Перевод твёрдости</h1>
+    <p class="sub">Приближённое соответствие между шкалами твёрдости и пределом прочности для углеродистых и легированных сталей.</p>
+    <div class="panel">
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>HB</th><th>HRC</th><th>HV</th><th>σв, МПа (прибл.)</th></tr></thead>
+          <tbody id="hardness-body"></tbody>
+        </table>
+      </div>
+      <div class="note warn">Таблица приближённая и годится только для ориентировочной оценки — соответствие шкал зависит от материала и структуры стали. Для ответственных случаев измеряй нужную шкалу напрямую.</div>
+    </div>
+  </section>
+
+  <!-- ROUGHNESS -->
+  <section id="page-roughness" class="page">
+    <div class="eyebrow">Раздел 10 · ГОСТ 2789-73</div>
+    <h1>Шероховатость поверхности</h1>
+    <p class="sub">Соответствие Ra и Rz, старые классы шероховатости и типичные методы обработки, которыми они достигаются.</p>
+    <div class="panel">
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Ra, мкм</th><th>Rz, мкм</th><th>Класс (ст.)</th><th>Типичная обработка</th></tr></thead>
+          <tbody id="roughness-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MASS CALCULATOR -->
+  <section id="page-mass" class="page">
+    <div class="eyebrow">Раздел 11 · калькулятор</div>
+    <h1>Расчёт массы заготовки</h1>
+    <p class="sub">Круг, квадрат, шестигранник, труба или лист/полоса — вводишь размеры и материал, получаешь массу.</p>
+    <div class="panel">
+      <div class="row">
+        <div class="field">
+          <label for="mass-shape">Форма</label>
+          <select id="mass-shape">
+            <option value="round">Круг (пруток)</option>
+            <option value="square">Квадрат</option>
+            <option value="hex">Шестигранник</option>
+            <option value="pipe">Труба</option>
+            <option value="plate">Лист/полоса</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mass-material">Материал</label>
+          <select id="mass-material"></select>
+        </div>
+      </div>
+      <div class="row" id="mass-fields" style="margin-top:16px;"></div>
+      <div id="mass-output"></div>
+    </div>
+  </section>
+
+  <!-- FAVORITES -->
+  <section id="page-favorites" class="page">
+    <div class="eyebrow">Закреплённое</div>
+    <h1>Избранное</h1>
+    <p class="sub">Всё, что закреплено звёздочкой ☆ в таблицах. Хранится локально в этом браузере.</p>
+    <div class="panel">
+      <div id="fav-list"></div>
     </div>
   </section>
 
@@ -413,7 +652,7 @@ function renderGost(){
   const cat = document.getElementById('gost-cat').value;
   const status = document.getElementById('gost-status').value;
 
-  const filtered = gostData.filter(g=>{
+  const filtered = gostData.map((g,i)=>({...g,_i:i})).filter(g=>{
     const matchesQ = !q || g.num.toLowerCase().includes(q) || g.name.toLowerCase().includes(q);
     const matchesCat = !cat || g.cat === cat;
     const matchesStatus = !status || g.status === status;
@@ -425,6 +664,7 @@ function renderGost(){
 
   body.innerHTML = filtered.map(g=>`
     <tr>
+      <td class="star-cell"><button class="star ${isFav('gost',g._i)?'on':''}" data-page="gost" data-id="${g._i}">${isFav('gost',g._i)?'★':'☆'}</button></td>
       <td style="font-family:var(--mono); white-space:nowrap; font-weight:600;">${g.num}</td>
       <td>${g.name}</td>
       <td><span class="tag">${g.cat}</span></td>
@@ -455,11 +695,12 @@ renderGost();
 function renderMaterials(){
   const body = document.getElementById('mat-body');
   const q = document.getElementById('mat-search').value.trim().toLowerCase();
-  const filtered = materialsData.filter(m=>!q || m.grade.toLowerCase().includes(q) || m.gost.toLowerCase().includes(q));
+  const filtered = materialsData.map((m,i)=>({...m,_i:i})).filter(m=>!q || m.grade.toLowerCase().includes(q) || m.gost.toLowerCase().includes(q));
   document.getElementById('mat-count').textContent = `Найдено: ${filtered.length} из ${materialsData.length}`;
   document.getElementById('mat-empty').style.display = filtered.length ? 'none':'block';
   body.innerHTML = filtered.map(m=>`
     <tr>
+      <td class="star-cell"><button class="star ${isFav('materials',m._i)?'on':''}" data-page="materials" data-id="${m._i}">${isFav('materials',m._i)?'★':'☆'}</button></td>
       <td style="font-weight:700; white-space:nowrap;">${m.grade}</td>
       <td style="font-family:var(--mono); font-size:12.5px; white-space:nowrap;">${m.gost}</td>
       <td style="color:#4c6577; font-size:12.5px;">${m.chem}</td>
@@ -477,11 +718,12 @@ renderMaterials();
 function renderLit(){
   const body = document.getElementById('lit-body');
   const q = document.getElementById('lit-search').value.trim().toLowerCase();
-  const filtered = literatureData.filter(l=>!q || l.topic.toLowerCase().includes(q) || l.vol.toLowerCase().includes(q));
+  const filtered = literatureData.map((l,i)=>({...l,_i:i})).filter(l=>!q || l.topic.toLowerCase().includes(q) || l.vol.toLowerCase().includes(q));
   document.getElementById('lit-count').textContent = `Найдено: ${filtered.length} из ${literatureData.length}`;
   document.getElementById('lit-empty').style.display = filtered.length ? 'none':'block';
   body.innerHTML = filtered.map(l=>`
     <tr>
+      <td class="star-cell"><button class="star ${isFav('literature',l._i)?'on':''}" data-page="literature" data-id="${l._i}">${isFav('literature',l._i)?'★':'☆'}</button></td>
       <td>${l.src}</td>
       <td style="font-family:var(--mono); white-space:nowrap;">${l.vol}</td>
       <td>${l.topic}</td>
@@ -664,6 +906,399 @@ function renderITTable(){
   document.getElementById('it-table').innerHTML = html;
 }
 renderITTable();
+
+/* ============ FAVORITES ============ */
+function getFavorites(){
+  try{ return JSON.parse(localStorage.getItem('eng_favorites')) || []; }
+  catch(e){ return []; }
+}
+function isFav(page, id){ return getFavorites().includes(page+'::'+id); }
+const favRenderMap = {}; // populated below once render fns exist
+function toggleFav(page, id){
+  let favs = getFavorites();
+  const k = page+'::'+id;
+  favs = favs.includes(k) ? favs.filter(f=>f!==k) : [...favs, k];
+  localStorage.setItem('eng_favorites', JSON.stringify(favs));
+  if(favRenderMap[page]) favRenderMap[page]();
+  renderFavorites();
+}
+document.addEventListener('click', e=>{
+  const btn = e.target.closest('.star');
+  if(!btn) return;
+  toggleFav(btn.dataset.page, btn.dataset.id);
+});
+
+/* ============ DATA: THREADS ============ */
+const threadsData = [
+  {d:"M3",  coarse:0.5,  fine:"—",   drill:2.5,  area:5.0},
+  {d:"M4",  coarse:0.7,  fine:"—",   drill:3.3,  area:8.8},
+  {d:"M5",  coarse:0.8,  fine:"—",   drill:4.2,  area:14.2},
+  {d:"M6",  coarse:1.0,  fine:0.75,  drill:5.0,  area:20.1},
+  {d:"M8",  coarse:1.25, fine:1.0,   drill:6.8,  area:36.6},
+  {d:"M10", coarse:1.5,  fine:1.25,  drill:8.5,  area:58.0},
+  {d:"M12", coarse:1.75, fine:1.25,  drill:10.2, area:84.3},
+  {d:"M14", coarse:2.0,  fine:1.5,   drill:12.0, area:115},
+  {d:"M16", coarse:2.0,  fine:1.5,   drill:14.0, area:157},
+  {d:"M18", coarse:2.5,  fine:1.5,   drill:15.5, area:192},
+  {d:"M20", coarse:2.5,  fine:1.5,   drill:17.5, area:245},
+  {d:"M24", coarse:3.0,  fine:2.0,   drill:21.0, area:353},
+  {d:"M30", coarse:3.5,  fine:2.0,   drill:26.5, area:561},
+  {d:"M36", coarse:4.0,  fine:3.0,   drill:32.0, area:817},
+];
+function renderThreads(){
+  const body = document.getElementById('threads-body');
+  const q = document.getElementById('threads-search').value.trim().toLowerCase();
+  const filtered = threadsData.map((t,i)=>({...t,_i:i})).filter(t=>!q || t.d.toLowerCase().includes(q));
+  document.getElementById('threads-count').textContent = `Найдено: ${filtered.length} из ${threadsData.length}`;
+  document.getElementById('threads-empty').style.display = filtered.length ? 'none':'block';
+  body.innerHTML = filtered.map(t=>`
+    <tr>
+      <td class="star-cell"><button class="star ${isFav('threads',t._i)?'on':''}" data-page="threads" data-id="${t._i}">${isFav('threads',t._i)?'★':'☆'}</button></td>
+      <td style="font-family:var(--mono); font-weight:700;">${t.d}</td>
+      <td>${t.coarse}</td>
+      <td>${t.fine}</td>
+      <td>${t.drill}</td>
+      <td>${t.area}</td>
+    </tr>
+  `).join('');
+}
+document.getElementById('threads-search').addEventListener('input', renderThreads);
+favRenderMap.threads = renderThreads;
+renderThreads();
+
+/* ============ DATA: FASTENERS ============ */
+const fastenersData = [
+  {d:"M3",  wrench:5.5, nutH:2.4, washerOd:7},
+  {d:"M4",  wrench:7,   nutH:3.2, washerOd:9},
+  {d:"M5",  wrench:8,   nutH:4.0, washerOd:10},
+  {d:"M6",  wrench:10,  nutH:5.0, washerOd:12.5},
+  {d:"M8",  wrench:13,  nutH:6.5, washerOd:17},
+  {d:"M10", wrench:17,  nutH:8.0, washerOd:21},
+  {d:"M12", wrench:19,  nutH:10.0, washerOd:24},
+  {d:"M14", wrench:22,  nutH:11.0, washerOd:28},
+  {d:"M16", wrench:24,  nutH:13.0, washerOd:30},
+  {d:"M18", wrench:27,  nutH:15.0, washerOd:34},
+  {d:"M20", wrench:30,  nutH:16.0, washerOd:37},
+  {d:"M24", wrench:36,  nutH:19.0, washerOd:44},
+  {d:"M30", wrench:46,  nutH:24.0, washerOd:56},
+  {d:"M36", wrench:55,  nutH:29.0, washerOd:66},
+];
+function renderFasteners(){
+  const body = document.getElementById('fasteners-body');
+  const q = document.getElementById('fasteners-search').value.trim().toLowerCase();
+  const filtered = fastenersData.map((f,i)=>({...f,_i:i})).filter(f=>!q || f.d.toLowerCase().includes(q));
+  document.getElementById('fasteners-count').textContent = `Найдено: ${filtered.length} из ${fastenersData.length}`;
+  document.getElementById('fasteners-empty').style.display = filtered.length ? 'none':'block';
+  body.innerHTML = filtered.map(f=>`
+    <tr>
+      <td class="star-cell"><button class="star ${isFav('fasteners',f._i)?'on':''}" data-page="fasteners" data-id="${f._i}">${isFav('fasteners',f._i)?'★':'☆'}</button></td>
+      <td style="font-family:var(--mono); font-weight:700;">${f.d}</td>
+      <td>${f.wrench}</td>
+      <td>${f.nutH}</td>
+      <td>${f.washerOd}</td>
+    </tr>
+  `).join('');
+}
+document.getElementById('fasteners-search').addEventListener('input', renderFasteners);
+favRenderMap.fasteners = renderFasteners;
+renderFasteners();
+
+/* ============ DATA: BEARINGS ============ */
+const bearingsData = [
+  {code:"6000", d:10, D:26, B:8,  Cr:4.5,  C0r:2.4},
+  {code:"6001", d:12, D:28, B:8,  Cr:5.1,  C0r:2.85},
+  {code:"6002", d:15, D:32, B:9,  Cr:5.6,  C0r:3.25},
+  {code:"6003", d:17, D:35, B:10, Cr:6.0,  C0r:3.6},
+  {code:"6004", d:20, D:42, B:12, Cr:9.4,  C0r:5.65},
+  {code:"6200", d:10, D:30, B:9,  Cr:5.1,  C0r:2.4},
+  {code:"6201", d:12, D:32, B:10, Cr:6.8,  C0r:3.05},
+  {code:"6202", d:15, D:35, B:11, Cr:7.65, C0r:3.75},
+  {code:"6203", d:17, D:40, B:12, Cr:9.5,  C0r:4.75},
+  {code:"6204", d:20, D:47, B:14, Cr:12.7, C0r:6.55},
+  {code:"6205", d:25, D:52, B:15, Cr:14.0, C0r:7.8},
+  {code:"6206", d:30, D:62, B:16, Cr:19.5, C0r:11.2},
+  {code:"6207", d:35, D:72, B:17, Cr:25.5, C0r:15.3},
+  {code:"6208", d:40, D:80, B:18, Cr:29.5, C0r:18.0},
+  {code:"6305", d:25, D:62, B:17, Cr:22.5, C0r:11.9},
+  {code:"6306", d:30, D:72, B:19, Cr:28.1, C0r:14.6},
+];
+function renderBearings(){
+  const body = document.getElementById('bearings-body');
+  const q = document.getElementById('bearings-search').value.trim().toLowerCase();
+  const filtered = bearingsData.map((b,i)=>({...b,_i:i})).filter(b=>!q || b.code.toLowerCase().includes(q));
+  document.getElementById('bearings-count').textContent = `Найдено: ${filtered.length} из ${bearingsData.length}`;
+  document.getElementById('bearings-empty').style.display = filtered.length ? 'none':'block';
+  body.innerHTML = filtered.map(b=>`
+    <tr>
+      <td class="star-cell"><button class="star ${isFav('bearings',b._i)?'on':''}" data-page="bearings" data-id="${b._i}">${isFav('bearings',b._i)?'★':'☆'}</button></td>
+      <td style="font-family:var(--mono); font-weight:700;">${b.code}</td>
+      <td>${b.d}</td>
+      <td>${b.D}</td>
+      <td>${b.B}</td>
+      <td>${b.Cr}</td>
+      <td>${b.C0r}</td>
+    </tr>
+  `).join('');
+}
+document.getElementById('bearings-search').addEventListener('input', renderBearings);
+favRenderMap.bearings = renderBearings;
+renderBearings();
+
+/* ============ DATA: SORTAMENT ============ */
+const sortamentData = [
+  {type:"Уголок равнополочный", size:"25×25×3", weight:1.12, gost:"ГОСТ 8509-93"},
+  {type:"Уголок равнополочный", size:"32×32×3", weight:1.46, gost:"ГОСТ 8509-93"},
+  {type:"Уголок равнополочный", size:"40×40×4", weight:2.42, gost:"ГОСТ 8509-93"},
+  {type:"Уголок равнополочный", size:"50×50×5", weight:3.77, gost:"ГОСТ 8509-93"},
+  {type:"Уголок равнополочный", size:"63×63×5", weight:4.82, gost:"ГОСТ 8509-93"},
+  {type:"Уголок равнополочный", size:"75×75×6", weight:6.89, gost:"ГОСТ 8509-93"},
+  {type:"Швеллер", size:"№5",  weight:4.84,  gost:"ГОСТ 8240-97"},
+  {type:"Швеллер", size:"№8",  weight:7.05,  gost:"ГОСТ 8240-97"},
+  {type:"Швеллер", size:"№10", weight:8.59,  gost:"ГОСТ 8240-97"},
+  {type:"Швеллер", size:"№12", weight:10.4,  gost:"ГОСТ 8240-97"},
+  {type:"Швеллер", size:"№16", weight:14.2,  gost:"ГОСТ 8240-97"},
+  {type:"Труба электросварная", size:"20×2",   weight:0.888, gost:"ГОСТ 10704-91"},
+  {type:"Труба электросварная", size:"32×2.5", weight:1.86,  gost:"ГОСТ 10704-91"},
+  {type:"Труба электросварная", size:"57×3",   weight:3.95,  gost:"ГОСТ 10704-91"},
+  {type:"Труба электросварная", size:"76×3.5", weight:6.26,  gost:"ГОСТ 10704-91"},
+  {type:"Лист горячекатаный (кг/м²)", size:"δ2", weight:15.7, gost:"ГОСТ 19903-2015"},
+  {type:"Лист горячекатаный (кг/м²)", size:"δ4", weight:31.4, gost:"ГОСТ 19903-2015"},
+  {type:"Лист горячекатаный (кг/м²)", size:"δ6", weight:47.1, gost:"ГОСТ 19903-2015"},
+  {type:"Лист горячекатаный (кг/м²)", size:"δ10", weight:78.5, gost:"ГОСТ 19903-2015"},
+];
+function renderSortament(){
+  const body = document.getElementById('sortament-body');
+  const q = document.getElementById('sortament-search').value.trim().toLowerCase();
+  const filtered = sortamentData.map((s,i)=>({...s,_i:i})).filter(s=>!q || (s.type+' '+s.size).toLowerCase().includes(q));
+  document.getElementById('sortament-count').textContent = `Найдено: ${filtered.length} из ${sortamentData.length}`;
+  document.getElementById('sortament-empty').style.display = filtered.length ? 'none':'block';
+  body.innerHTML = filtered.map(s=>`
+    <tr>
+      <td class="star-cell"><button class="star ${isFav('sortament',s._i)?'on':''}" data-page="sortament" data-id="${s._i}">${isFav('sortament',s._i)?'★':'☆'}</button></td>
+      <td>${s.type}</td>
+      <td style="font-family:var(--mono); font-weight:700; white-space:nowrap;">${s.size}</td>
+      <td>${s.weight}</td>
+      <td style="font-family:var(--mono); font-size:12.5px; color:#4c6577; white-space:nowrap;">${s.gost}</td>
+    </tr>
+  `).join('');
+}
+document.getElementById('sortament-search').addEventListener('input', renderSortament);
+favRenderMap.sortament = renderSortament;
+renderSortament();
+
+/* ============ DATA: HARDNESS (static, approximate) ============ */
+const hardnessData = [
+  {hb:120, hrc:"—", hv:126, sigma:410},
+  {hb:140, hrc:"—", hv:147, sigma:480},
+  {hb:160, hrc:"—", hv:169, sigma:550},
+  {hb:180, hrc:"—", hv:191, sigma:620},
+  {hb:200, hrc:13,  hv:212, sigma:690},
+  {hb:220, hrc:20,  hv:233, sigma:760},
+  {hb:250, hrc:24,  hv:266, sigma:865},
+  {hb:280, hrc:28,  hv:298, sigma:970},
+  {hb:300, hrc:31,  hv:319, sigma:1030},
+  {hb:350, hrc:37,  hv:372, sigma:1200},
+  {hb:400, hrc:41,  hv:425, sigma:1370},
+  {hb:450, hrc:45,  hv:478, sigma:1550},
+];
+function renderHardness(){
+  document.getElementById('hardness-body').innerHTML = hardnessData.map(h=>`
+    <tr><td style="font-weight:700;">${h.hb}</td><td>${h.hrc}</td><td>${h.hv}</td><td>${h.sigma}</td></tr>
+  `).join('');
+}
+renderHardness();
+
+/* ============ DATA: ROUGHNESS (static) ============ */
+const roughnessData = [
+  {ra:12.5, rz:63, cls:"3",  method:"Черновое точение, фрезерование"},
+  {ra:6.3,  rz:32, cls:"4",  method:"Получистовое точение, фрезерование"},
+  {ra:3.2,  rz:16, cls:"5",  method:"Чистовое точение, фрезерование"},
+  {ra:1.6,  rz:8,  cls:"6",  method:"Чистовое точение, развёртывание"},
+  {ra:0.8,  rz:4,  cls:"7",  method:"Шлифование чистовое"},
+  {ra:0.4,  rz:2,  cls:"8",  method:"Шлифование тонкое"},
+  {ra:0.2,  rz:1,  cls:"9",  method:"Хонингование, суперфиниш"},
+  {ra:0.1,  rz:0.5,cls:"10", method:"Полирование"},
+];
+function renderRoughness(){
+  document.getElementById('roughness-body').innerHTML = roughnessData.map(r=>`
+    <tr><td style="font-weight:700;">${r.ra}</td><td>${r.rz}</td><td>${r.cls}</td><td>${r.method}</td></tr>
+  `).join('');
+}
+renderRoughness();
+
+/* ============ MASS CALCULATOR ============ */
+const densities = {
+  "Сталь конструкционная": 7850,
+  "Нержавеющая сталь": 7900,
+  "Чугун": 7200,
+  "Алюминий и сплавы": 2700,
+  "Медь": 8900,
+  "Латунь": 8500,
+  "Бронза": 8800,
+  "Титан и сплавы": 4500,
+};
+const massShapes = {
+  round:  {fields:[{id:'mass-d', label:'Диаметр d, мм', def:20}]},
+  square: {fields:[{id:'mass-a', label:'Сторона a, мм', def:20}]},
+  hex:    {fields:[{id:'mass-s', label:'Размер под ключ s, мм', def:20}]},
+  pipe:   {fields:[{id:'mass-D', label:'Наружный диаметр D, мм', def:32},{id:'mass-t', label:'Толщина стенки t, мм', def:3}]},
+  plate:  {fields:[{id:'mass-w', label:'Ширина, мм', def:100},{id:'mass-th', label:'Толщина, мм', def:5}]},
+};
+const massMaterialSel = document.getElementById('mass-material');
+Object.keys(densities).forEach(name=>{
+  const o = document.createElement('option'); o.value = name; o.textContent = name;
+  massMaterialSel.appendChild(o);
+});
+function renderMassFields(){
+  const shape = document.getElementById('mass-shape').value;
+  const container = document.getElementById('mass-fields');
+  const fields = massShapes[shape].fields;
+  container.innerHTML = fields.map(f=>`
+    <div class="field">
+      <label for="${f.id}">${f.label}</label>
+      <input type="number" id="${f.id}" min="0" step="0.1" value="${f.def}">
+    </div>
+  `).join('') + `
+    <div class="field">
+      <label for="mass-length">Длина, мм</label>
+      <input type="number" id="mass-length" min="0" step="1" value="1000">
+    </div>
+  `;
+  fields.concat([{id:'mass-length'}]).forEach(f=>{
+    document.getElementById(f.id).addEventListener('input', computeMass);
+  });
+  computeMass();
+}
+function computeMass(){
+  const shape = document.getElementById('mass-shape').value;
+  const density = densities[massMaterialSel.value];
+  const L = parseFloat(document.getElementById('mass-length').value) || 0;
+  let volumeMm3 = 0;
+  if(shape === 'round'){
+    const d = parseFloat(document.getElementById('mass-d').value) || 0;
+    volumeMm3 = Math.PI/4 * d*d * L;
+  } else if(shape === 'square'){
+    const a = parseFloat(document.getElementById('mass-a').value) || 0;
+    volumeMm3 = a*a * L;
+  } else if(shape === 'hex'){
+    const s = parseFloat(document.getElementById('mass-s').value) || 0;
+    volumeMm3 = 0.866 * s*s * L;
+  } else if(shape === 'pipe'){
+    const D = parseFloat(document.getElementById('mass-D').value) || 0;
+    const t = parseFloat(document.getElementById('mass-t').value) || 0;
+    const dIn = Math.max(D - 2*t, 0);
+    volumeMm3 = Math.PI/4 * (D*D - dIn*dIn) * L;
+  } else if(shape === 'plate'){
+    const w = parseFloat(document.getElementById('mass-w').value) || 0;
+    const th = parseFloat(document.getElementById('mass-th').value) || 0;
+    volumeMm3 = w*th*L;
+  }
+  const massKg = (volumeMm3/1e9) * density;
+  document.getElementById('mass-output').innerHTML = `
+    <div class="result">
+      <div class="result-grid">
+        <div class="stat hi"><div class="k">Масса</div><div class="v">${massKg.toFixed(massKg<1?3:2)} кг</div></div>
+        <div class="stat"><div class="k">Объём</div><div class="v">${(volumeMm3/1000).toFixed(1)} см³</div></div>
+        <div class="stat"><div class="k">Плотность</div><div class="v">${density} кг/м³</div></div>
+      </div>
+    </div>
+  `;
+}
+document.getElementById('mass-shape').addEventListener('change', renderMassFields);
+massMaterialSel.addEventListener('change', computeMass);
+renderMassFields();
+
+/* ============ FAVORITES PAGE ============ */
+const dataArrays = { gost:gostData, materials:materialsData, literature:literatureData, threads:threadsData, fasteners:fastenersData, bearings:bearingsData, sortament:sortamentData };
+const sourceLabels = { gost:'ГОСТ', materials:'Материал', literature:'Литература', threads:'Резьба', fasteners:'Крепёж', bearings:'Подшипник', sortament:'Сортамент' };
+function favTitle(page, item){
+  switch(page){
+    case 'gost': return item.num + ' — ' + item.name;
+    case 'materials': return item.grade + ' (' + item.gost + ')';
+    case 'literature': return item.src + ', ' + item.vol + ' — ' + item.topic;
+    case 'threads': return item.d + ' · шаг ' + item.coarse + ' мм';
+    case 'fasteners': return item.d + ' · ключ ' + item.wrench + ' мм';
+    case 'bearings': return item.code + ' · d' + item.d + '×D' + item.D + '×B' + item.B;
+    case 'sortament': return item.type + ' ' + item.size;
+    default: return '';
+  }
+}
+function renderFavorites(){
+  const wrap = document.getElementById('fav-list');
+  const favs = getFavorites();
+  if(!favs.length){
+    wrap.innerHTML = '<div class="empty">Пока нет избранного — нажимай ☆ в таблицах, чтобы закрепить нужные записи здесь.</div>';
+    return;
+  }
+  wrap.innerHTML = favs.map(k=>{
+    const sep = k.indexOf('::');
+    const page = k.slice(0, sep), idx = parseInt(k.slice(sep+2), 10);
+    const item = dataArrays[page] && dataArrays[page][idx];
+    if(!item) return '';
+    return `
+      <div class="fav-row">
+        <button class="star on" data-page="${page}" data-id="${idx}">★</button>
+        <span class="tag">${sourceLabels[page]}</span>
+        <span class="fav-title">${favTitle(page, item)}</span>
+      </div>
+    `;
+  }).join('');
+}
+favRenderMap.favorites = renderFavorites;
+renderFavorites();
+
+/* ============ GLOBAL SEARCH ============ */
+const pageLabels = { gost:'ГОСТы', materials:'Материалы', literature:'Литература', threads:'Резьбы', fasteners:'Крепёж', bearings:'Подшипники', sortament:'Сортамент' };
+const pageSearchIds = { gost:'gost-search', materials:'mat-search', literature:'lit-search', threads:'threads-search', fasteners:'fasteners-search', bearings:'bearings-search', sortament:'sortament-search' };
+function globalSearch(q){
+  q = q.trim().toLowerCase();
+  if(!q) return [];
+  const results = [];
+  gostData.forEach(g=>{ if(g.num.toLowerCase().includes(q) || g.name.toLowerCase().includes(q)) results.push({page:'gost', label:g.num, desc:g.name}); });
+  materialsData.forEach(m=>{ if(m.grade.toLowerCase().includes(q) || m.gost.toLowerCase().includes(q)) results.push({page:'materials', label:m.grade, desc:m.gost}); });
+  literatureData.forEach(l=>{ if(l.topic.toLowerCase().includes(q) || l.vol.toLowerCase().includes(q)) results.push({page:'literature', label:l.vol, desc:l.topic}); });
+  threadsData.forEach(t=>{ if(t.d.toLowerCase().includes(q)) results.push({page:'threads', label:t.d, desc:'Шаг ' + t.coarse + ' мм'}); });
+  fastenersData.forEach(f=>{ if(f.d.toLowerCase().includes(q)) results.push({page:'fasteners', label:f.d, desc:'Ключ ' + f.wrench + ' мм'}); });
+  bearingsData.forEach(b=>{ if(b.code.toLowerCase().includes(q)) results.push({page:'bearings', label:b.code, desc:'d'+b.d+'×D'+b.D+'×B'+b.B}); });
+  sortamentData.forEach(s=>{ if((s.type+' '+s.size).toLowerCase().includes(q)) results.push({page:'sortament', label:s.type+' '+s.size, desc:s.weight+' кг/м'}); });
+  return results.slice(0, 24);
+}
+const gsInput = document.getElementById('global-search');
+const gsResults = document.getElementById('gs-results');
+gsInput.addEventListener('input', ()=>{
+  const q = gsInput.value;
+  if(!q.trim()){ gsResults.classList.remove('show'); return; }
+  const results = globalSearch(q);
+  if(!results.length){
+    gsResults.innerHTML = '<div class="gs-empty">Ничего не найдено</div>';
+    gsResults.classList.add('show');
+    return;
+  }
+  const groups = {};
+  results.forEach(r=>{ (groups[r.page] = groups[r.page] || []).push(r); });
+  gsResults.innerHTML = Object.keys(groups).map(page=>`
+    <div class="gs-group">${pageLabels[page]}</div>
+    ${groups[page].map(r=>`<div class="gs-item" data-page="${page}" data-q="${r.label.replace(/"/g,'&quot;')}"><div class="t">${r.label}</div><div class="d">${r.desc}</div></div>`).join('')}
+  `).join('');
+  gsResults.classList.add('show');
+});
+gsResults.addEventListener('click', e=>{
+  const item = e.target.closest('.gs-item');
+  if(!item) return;
+  const page = item.dataset.page;
+  showPage(page);
+  gsResults.classList.remove('show');
+  const sid = pageSearchIds[page];
+  if(sid){
+    const el = document.getElementById(sid);
+    el.value = item.dataset.q;
+    el.dispatchEvent(new Event('input'));
+  }
+  gsInput.value = '';
+});
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.search-wrap')) gsResults.classList.remove('show');
+});
 </script>
 </body>
 </html>
