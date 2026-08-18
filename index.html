@@ -70,6 +70,27 @@
   nav button.active{
     background:#fff; color:var(--blueprint); font-weight:700;
   }
+  .hamburger{
+    display:none;
+    margin-left:auto;
+    align-items:center; justify-content:center;
+    width:40px; height:40px;
+    background:transparent; border:1px solid var(--blueprint-line); color:#fff;
+    font-size:18px; border-radius:3px; cursor:pointer;
+  }
+
+  @media (max-width: 860px){
+    .hamburger{ display:inline-flex; }
+    nav{
+      display:none;
+      width:100%;
+      flex-direction:column;
+      gap:2px;
+      margin-top:10px;
+    }
+    nav.open{ display:flex; }
+    nav button{ width:100%; text-align:left; padding:13px 14px; }
+  }
 
   .wrap{max-width:1080px;margin:0 auto; padding: 28px 16px 70px;}
   .page{display:none;}
@@ -127,6 +148,28 @@
   }
   tbody td{ padding:10px; border-bottom:1px solid var(--paper-line); vertical-align:top; }
   tbody tr:hover{ background:#e4ecf1; }
+
+  /* keep the identifying column in view while scrolling wide tables sideways (mostly matters on mobile) */
+  .tbl-sticky td:nth-child(-n+2), .tbl-sticky th:nth-child(-n+2){
+    position:sticky; left:0; background:var(--paper); z-index:1;
+  }
+  .tbl-sticky td:nth-child(2), .tbl-sticky th:nth-child(2){ left: var(--star-col-w, 44px); }
+  .tbl-sticky-1 td:first-child, .tbl-sticky-1 th:first-child{
+    position:sticky; left:0; background:var(--paper); z-index:1;
+  }
+
+  /* --- scroll to top --- */
+  #scroll-top{
+    position:fixed; right:18px; bottom:18px; z-index:60;
+    width:46px; height:46px; border-radius:50%;
+    background:var(--blueprint); border:1px solid var(--blueprint-line); color:#fff;
+    font-size:20px; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.35);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transform:translateY(8px);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  #scroll-top.show{ opacity:1; pointer-events:auto; transform:none; }
+  #scroll-top:hover{ background:var(--accent); border-color:var(--accent); }
   .tag{
     display:inline-block; font-family:var(--mono); font-size:11px; padding:2px 8px;
     border-radius:20px; background:#dbe7ee; color:var(--blueprint); white-space:nowrap;
@@ -185,10 +228,10 @@
   /* --- favorites / star --- */
   .star{
     background:transparent; border:none; cursor:pointer; font-size:16px; color:#c9963d;
-    padding:0 4px; line-height:1;
+    padding:8px 4px; line-height:1;
   }
   .star.on{ color:var(--accent); }
-  .star-cell{ width:30px; text-align:center; }
+  .star-cell{ width:44px; text-align:center; }
   .fav-row{
     display:flex; align-items:center; gap:10px; padding:12px 6px; border-bottom:1px solid var(--paper-line);
   }
@@ -219,6 +262,9 @@
     .search-wrap{ margin-left:0; width:100%; }
     .global-search{ width:100%; }
   }
+
+  /* --- keyboard focus, mouse users don't see this --- */
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 </style>
 </head>
 <body>
@@ -226,6 +272,7 @@
 <div class="topbar">
   <div class="topbar-inner">
     <div class="brand">ИНЖ<span>.</span>СПРАВОЧНИК</div>
+    <button class="hamburger" id="nav-toggle" aria-label="Меню" aria-expanded="false">☰</button>
     <nav id="nav">
       <button data-page="home" class="active">Главная</button>
       <button data-page="gost">ГОСТы</button>
@@ -365,7 +412,7 @@
       </div>
       <div class="count" id="gost-count"></div>
       <div style="overflow-x:auto;">
-        <table>
+        <table class="tbl-sticky">
           <thead><tr><th></th><th>Номер</th><th>Название</th><th>Категория</th><th>Статус</th><th>Описание</th><th>Ссылки</th></tr></thead>
           <tbody id="gost-body"></tbody>
         </table>
@@ -409,7 +456,7 @@
       <h2 style="color:var(--ink);">Таблица IT-квалитетов (мкм)</h2>
       <p style="color:#4c6577; font-size:13px; margin-top:2px;">Справочные значения допуска по ГОСТ 25346-2013 для основных квалитетов.</p>
       <div style="overflow-x:auto; margin-top:12px;">
-        <table id="it-table"></table>
+        <table id="it-table" class="tbl-sticky-1"></table>
       </div>
     </div>
   </section>
@@ -426,7 +473,7 @@
       </div>
       <div class="count" id="mat-count"></div>
       <div style="overflow-x:auto;">
-        <table>
+        <table class="tbl-sticky">
           <thead><tr><th></th><th>Марка</th><th>ГОСТ</th><th>Химсостав</th><th>Мех. свойства</th><th>Применение</th><th>Аналоги</th><th>Файл</th></tr></thead>
           <tbody id="mat-body"></tbody>
         </table>
@@ -496,7 +543,7 @@
       </div>
       <div class="count" id="lit-count"></div>
       <div style="overflow-x:auto;">
-        <table>
+        <table class="tbl-sticky">
           <thead><tr><th></th><th>Источник</th><th>Том/раздел</th><th>Тема</th><th>Страницы</th><th>Содержание</th><th>Файл</th></tr></thead>
           <tbody id="lit-body"></tbody>
         </table>
@@ -516,7 +563,7 @@
       </div>
       <div class="count" id="threads-count"></div>
       <div style="overflow-x:auto;">
-        <table>
+        <table class="tbl-sticky">
           <thead><tr><th></th><th>Обозначение</th><th>Шаг крупный, мм</th><th>Шаг мелкий, мм</th><th>Сверло под резьбу, мм</th><th>Площадь сечения, мм²</th></tr></thead>
           <tbody id="threads-body"></tbody>
         </table>
@@ -537,7 +584,7 @@
       </div>
       <div class="count" id="fasteners-count"></div>
       <div style="overflow-x:auto;">
-        <table>
+        <table class="tbl-sticky">
           <thead><tr><th></th><th>Резьба</th><th>Ключ, мм</th><th>Высота гайки, мм</th><th>Шайба (нар. Ø), мм</th></tr></thead>
           <tbody id="fasteners-body"></tbody>
         </table>
@@ -600,7 +647,7 @@
       </div>
       <div class="count" id="bearings-count" style="margin-top:12px;"></div>
       <div style="overflow-x:auto;">
-        <table>
+        <table class="tbl-sticky">
           <thead><tr><th></th><th>Обозначение</th><th>Тип</th><th>d — вал, мм</th><th>D — корпус, мм</th><th>h — ширина, мм</th><th>Cr дин., кН</th><th>C0r стат., кН</th><th></th></tr></thead>
           <tbody id="bearings-body"></tbody>
         </table>
@@ -621,7 +668,7 @@
       </div>
       <div class="count" id="sortament-count"></div>
       <div style="overflow-x:auto;">
-        <table>
+        <table class="tbl-sticky">
           <thead><tr><th></th><th>Профиль</th><th>Размер</th><th>Масса, кг/м</th><th>ГОСТ</th></tr></thead>
           <tbody id="sortament-body"></tbody>
         </table>
@@ -637,7 +684,7 @@
     <p class="sub">Приближённое соответствие между шкалами твёрдости и пределом прочности для углеродистых и легированных сталей.</p>
     <div class="panel">
       <div style="overflow-x:auto;">
-        <table>
+        <table class="tbl-sticky-1">
           <thead><tr><th>HB</th><th>HRC</th><th>HV</th><th>σв, МПа (прибл.)</th></tr></thead>
           <tbody id="hardness-body"></tbody>
         </table>
@@ -653,7 +700,7 @@
     <p class="sub">Ra — среднее арифметическое отклонение профиля, основной параметр на современных чертежах (пишется как «Ra 3.2»). Rz — высота неровностей по 10 точкам, встречается на старых чертежах.</p>
     <div class="panel">
       <div style="overflow-x:auto;">
-        <table>
+        <table class="tbl-sticky-1">
           <thead><tr><th>Ra, мкм</th><th>Rz, мкм (ориент.)</th><th>Типичная обработка</th><th>Где встречается</th></tr></thead>
           <tbody id="roughness-body"></tbody>
         </table>
@@ -771,6 +818,8 @@
   <footer>Инженерный справочник · обновляется прямо на GitHub · значения — справочные, для ответственных расчётов сверяйся с действующей редакцией ГОСТ</footer>
 </div>
 
+<button id="scroll-top" aria-label="Наверх" title="Наверх">↑</button>
+
 <script>
 /* ============ NAVIGATION ============ */
 function showPage(name){
@@ -778,9 +827,26 @@ function showPage(name){
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
   window.scrollTo({top:0, behavior:'instant'});
+  if(typeof syncStickyOffsets === 'function') syncStickyOffsets();
 }
-document.getElementById('nav').addEventListener('click', e=>{
-  if(e.target.tagName==='BUTTON') showPage(e.target.dataset.page);
+const navEl = document.getElementById('nav');
+const navToggle = document.getElementById('nav-toggle');
+navEl.addEventListener('click', e=>{
+  if(e.target.tagName==='BUTTON'){
+    showPage(e.target.dataset.page);
+    navEl.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+});
+navToggle.addEventListener('click', ()=>{
+  const open = navEl.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+document.addEventListener('click', e=>{
+  if(!e.target.closest('#nav') && !e.target.closest('#nav-toggle')){
+    navEl.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
 });
 
 /* ============ DATA — edit these arrays to add records ============ */
@@ -1344,7 +1410,7 @@ function computeBearingPick(){
   }).sort((a,b)=>a.D - b.D);
   out.innerHTML = `
     <div style="overflow-x:auto;">
-      <table>
+      <table class="tbl-sticky">
         <thead><tr><th></th><th>Обозначение</th><th>Тип</th><th>D, мм</th><th>B/T, мм</th><th>Cr, кН</th><th>Ресурс L10h, ч</th><th>Запас</th></tr></thead>
         <tbody>
           ${rows.map(b=>`
@@ -1795,6 +1861,35 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   });
 }
+
+/* ============ SCROLL TO TOP ============ */
+const scrollTopBtn = document.getElementById('scroll-top');
+window.addEventListener('scroll', ()=>{
+  scrollTopBtn.classList.toggle('show', window.scrollY > 400);
+});
+scrollTopBtn.addEventListener('click', ()=>{
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+/* ============ "/" TO FOCUS SEARCH ============ */
+document.addEventListener('keydown', e=>{
+  if(e.key !== '/') return;
+  const tag = document.activeElement.tagName;
+  if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  e.preventDefault();
+  document.getElementById('global-search').focus();
+});
+
+/* ============ STICKY TABLE COLUMN OFFSET (measured, not guessed) ============ */
+function syncStickyOffsets(){
+  const sample = document.querySelector('.page.active .star-cell');
+  if(!sample) return;
+  const w = sample.getBoundingClientRect().width;
+  if(w > 0) document.documentElement.style.setProperty('--star-col-w', w + 'px');
+}
+syncStickyOffsets();
+window.addEventListener('load', syncStickyOffsets);
+window.addEventListener('resize', syncStickyOffsets);
 </script>
 </body>
 </html>
