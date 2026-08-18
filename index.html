@@ -808,7 +808,7 @@ function gostExternalLink(num){
 }
 // ссылка на локальный файл в папке docs/ репозитория (появится, когда сам загрузишь PDF)
 function localFileLink(filename){
-  return `docs/${filename}`;
+  return `docs/${encodeURIComponent(filename)}`;
 }
 
 const materialsData = [
