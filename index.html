@@ -234,6 +234,8 @@
       <button data-page="hardness">Твёрдость</button>
       <button data-page="roughness">Шероховатость</button>
       <button data-page="mass">Расчёт массы</button>
+      <button data-page="sections">Сечения</button>
+      <button data-page="beams">Балки</button>
       <button data-page="literature">Анурьев / Литература</button>
       <button data-page="favorites">★ Избранное</button>
     </nav>
@@ -302,8 +304,18 @@
         <h3>Расчёт массы</h3>
         <p>Масса круга, квадрата, шестигранника, трубы, листа по материалу.</p>
       </div>
-      <div class="card" onclick="showPage('literature')">
+      <div class="card" onclick="showPage('sections')">
         <div class="num">11</div>
+        <h3>Сечения</h3>
+        <p>Площадь, момент инерции, момент сопротивления для прямоугольника, круга, трубы.</p>
+      </div>
+      <div class="card" onclick="showPage('beams')">
+        <div class="num">12</div>
+        <h3>Балки на прогиб</h3>
+        <p>Максимальный прогиб и изгибающий момент для балки и консоли.</p>
+      </div>
+      <div class="card" onclick="showPage('literature')">
+        <div class="num">13</div>
         <h3>Анурьев / Литература</h3>
         <p>Оглавление и ключевые таблицы справочника конструктора.</p>
       </div>
@@ -406,6 +418,7 @@
     <div class="panel">
       <div class="toolbar">
         <input class="search" id="mat-search" placeholder="Поиск по марке или ГОСТу…">
+        <select class="filter" id="mat-cat"><option value="">Все группы</option></select>
       </div>
       <div class="count" id="mat-count"></div>
       <div style="overflow-x:auto;">
@@ -481,17 +494,18 @@
 
   <!-- BEARINGS -->
   <section id="page-bearings" class="page">
-    <div class="eyebrow">Раздел 07 · ISO 15 / ГОСТ 8338-75</div>
-    <h1>Подшипники качения — шариковые радиальные</h1>
-    <p class="sub">Серии 6000 (лёгкая) и 6200 (средняя): посадочные размеры и грузоподъёмность.</p>
+    <div class="eyebrow">Раздел 07 · ISO 15 / ISO 104 / ГОСТ 8338-75</div>
+    <h1>Подшипники качения</h1>
+    <p class="sub">Стандартные размеры ISO — по ним делают все производители, включая SKF, поэтому подшипник с этими d/D/B взаимозаменяем независимо от бренда. Грузоподъёмность — ориентировочная, для точного подбора сверяйся с каталогом производителя.</p>
     <div class="panel">
       <div class="toolbar">
         <input class="search" id="bearings-search" placeholder="Поиск по обозначению…">
+        <select class="filter" id="bearings-type"><option value="">Все типы</option></select>
       </div>
       <div class="count" id="bearings-count"></div>
       <div style="overflow-x:auto;">
         <table>
-          <thead><tr><th></th><th>Обозначение</th><th>d, мм</th><th>D, мм</th><th>B, мм</th><th>Cr дин., кН</th><th>C0r стат., кН</th></tr></thead>
+          <thead><tr><th></th><th>Обозначение</th><th>Тип</th><th>d, мм</th><th>D, мм</th><th>B/T, мм</th><th>Cr дин., кН</th><th>C0r стат., кН</th><th></th></tr></thead>
           <tbody id="bearings-body"></tbody>
         </table>
       </div>
@@ -501,12 +515,13 @@
 
   <!-- SORTAMENT -->
   <section id="page-sortament" class="page">
-    <div class="eyebrow">Раздел 08 · ГОСТ 8509-93 / ГОСТ 8240-97 / ГОСТ 10704-91 / ГОСТ 19903-2015</div>
+    <div class="eyebrow">Раздел 08 · стандартный ГОСТ-сортамент</div>
     <h1>Сортамент проката</h1>
-    <p class="sub">Уголок равнополочный, швеллер, труба электросварная, лист горячекатаный — масса погонного метра (для листа — кг/м²).</p>
+    <p class="sub">Полный стандартный набор, который обычно есть в наличии у любого металлоторгового склада: круг, квадрат, полоса, арматура, уголок, швеллер, трубы. Масса погонного метра (для листа — кг/м²).</p>
     <div class="panel">
       <div class="toolbar">
         <input class="search" id="sortament-search" placeholder="Поиск по типу или размеру…">
+        <select class="filter" id="sortament-cat"><option value="">Все профили</option></select>
       </div>
       <div class="count" id="sortament-count"></div>
       <div style="overflow-x:auto;">
@@ -537,16 +552,17 @@
 
   <!-- ROUGHNESS -->
   <section id="page-roughness" class="page">
-    <div class="eyebrow">Раздел 10 · ГОСТ 2789-73</div>
+    <div class="eyebrow">Раздел 10 · ГОСТ 2.309-73 / ISO 1302</div>
     <h1>Шероховатость поверхности</h1>
-    <p class="sub">Соответствие Ra и Rz, старые классы шероховатости и типичные методы обработки, которыми они достигаются.</p>
+    <p class="sub">Ra — среднее арифметическое отклонение профиля, основной параметр на современных чертежах (пишется как «Ra 3.2»). Rz — высота неровностей по 10 точкам, встречается на старых чертежах.</p>
     <div class="panel">
       <div style="overflow-x:auto;">
         <table>
-          <thead><tr><th>Ra, мкм</th><th>Rz, мкм</th><th>Класс (ст.)</th><th>Типичная обработка</th></tr></thead>
+          <thead><tr><th>Ra, мкм</th><th>Rz, мкм (ориент.)</th><th>Типичная обработка</th><th>Где встречается</th></tr></thead>
           <tbody id="roughness-body"></tbody>
         </table>
       </div>
+      <div class="note">Ряд Ra — стандартный предпочтительный ряд (каждое значение вдвое меньше предыдущего). Столбец Rz — грубая оценка по правилу Rz ≈ 4×Ra для точения/фрезерования; для шлифования и полировки соотношение может быть другим (Rz ≈ 5–7×Ra) — если Rz задан на чертеже явно, всегда используй его, а не пересчёт.</div>
     </div>
   </section>
 
@@ -574,6 +590,75 @@
       </div>
       <div class="row" id="mass-fields" style="margin-top:16px;"></div>
       <div id="mass-output"></div>
+    </div>
+  </section>
+
+  <!-- SECTION PROPERTIES -->
+  <section id="page-sections" class="page">
+    <div class="eyebrow">Раздел 12 · калькулятор</div>
+    <h1>Геометрические характеристики сечения</h1>
+    <p class="sub">Площадь, момент инерции и момент сопротивления при изгибе — для прямоугольника, круга, трубы и квадрата. Момент инерции отсюда можно сразу использовать в расчёте балки на прогиб.</p>
+    <div class="panel">
+      <div class="row">
+        <div class="field">
+          <label for="sec-shape">Форма</label>
+          <select id="sec-shape">
+            <option value="rect">Прямоугольник</option>
+            <option value="square">Квадрат</option>
+            <option value="round">Круг</option>
+            <option value="pipe">Труба (кольцо)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="sec-fields" style="margin-top:16px;"></div>
+      <div id="sec-output"></div>
+    </div>
+  </section>
+
+  <!-- BEAM DEFLECTION -->
+  <section id="page-beams" class="page">
+    <div class="eyebrow">Раздел 13 · калькулятор · линейная теория упругости</div>
+    <h1>Балка на прогиб</h1>
+    <p class="sub">Максимальный прогиб и изгибающий момент для простой балки на двух опорах или консоли. Момент инерции I возьми со страницы «Сечения» для своего профиля.</p>
+    <div class="panel">
+      <div class="row">
+        <div class="field">
+          <label>Схема опирания</label>
+          <div class="toggle-group">
+            <button id="btn-beam-simple" class="active">Простая балка</button>
+            <button id="btn-beam-cantilever">Консоль</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Тип нагрузки</label>
+          <div class="toggle-group">
+            <button id="btn-load-point" class="active">Сосредоточенная</button>
+            <button id="btn-load-dist">Распределённая</button>
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:16px;">
+        <div class="field">
+          <label for="beam-length">Длина пролёта L, мм</label>
+          <input type="number" id="beam-length" min="1" step="1" value="500">
+        </div>
+        <div class="field">
+          <label for="beam-material">Материал (модуль упругости E)</label>
+          <select id="beam-material"></select>
+        </div>
+      </div>
+      <div class="row" style="margin-top:16px;">
+        <div class="field">
+          <label for="beam-inertia">Момент инерции I, мм⁴</label>
+          <input type="number" id="beam-inertia" min="0.001" step="1" value="7854">
+        </div>
+        <div class="field" id="beam-load-field">
+          <label for="beam-load">Сила F, Н</label>
+          <input type="number" id="beam-load" min="0" step="1" value="500">
+        </div>
+      </div>
+      <div id="beam-output"></div>
+      <div class="note warn">Формулы линейной теории упругости для малых прогибов однородного сечения по всей длине. Не учитывает концентраторы напряжений, собственный вес балки и пластические деформации — для ответственных конструкций проверяй расчётом с запасом.</div>
     </div>
   </section>
 
@@ -631,12 +716,24 @@ function localFileLink(filename){
 }
 
 const materialsData = [
-  {grade:"Сталь 45", gost:"ГОСТ 1050-2013", chem:"C 0.42-0.50, Mn 0.5-0.8, Si 0.17-0.37", mech:"σв ≥ 600 МПа, HB 170-229", app:"Валы, шестерни, оси", analog:"AISI 1045, C45 (DIN)", file:"stal-45.pdf"},
-  {grade:"Сталь 40Х", gost:"ГОСТ 4543-2016", chem:"C 0.36-0.44, Cr 0.8-1.1, Mn 0.5-0.8", mech:"σв ≥ 980 МПа, HB 217-269", app:"Валы, оси, зубчатые колёса под нагрузкой", analog:"AISI 5140, 41Cr4 (DIN)", file:"stal-40h.pdf"},
-  {grade:"Сталь 20", gost:"ГОСТ 1050-2013", chem:"C 0.17-0.24, Mn 0.35-0.65", mech:"σв ≥ 410 МПа, HB 131-179", app:"Цементируемые детали, втулки", analog:"AISI 1020, C22 (DIN)", file:"stal-20.pdf"},
-  {grade:"Сталь 09Г2С", gost:"ГОСТ 19281-2014", chem:"C ≤0.12, Mn 1.3-1.7, Si 0.5-0.8", mech:"σв ≥ 450 МПа", app:"Сварные металлоконструкции, рамы", analog:"S355 (EN), A572 (ASTM)", file:"stal-09g2s.pdf"},
-  {grade:"Сталь 12Х18Н10Т", gost:"ГОСТ 5632-2014", chem:"C ≤0.12, Cr 17-19, Ni 9-11, Ti", mech:"σв ≥ 550 МПа", app:"Коррозионностойкие детали, пищевое оборудование", analog:"AISI 321, X6CrNiTi18-10", file:"stal-12h18n10t.pdf"},
-  {grade:"Сталь 65Г", gost:"ГОСТ 14959-2016", chem:"C 0.62-0.70, Mn 0.9-1.2", mech:"σв ≥ 1000 МПа (после закалки)", app:"Пружины, шайбы, режущий инструмент", analog:"AISI 1065, 65Mn (DIN)", file:"stal-65g.pdf"},
+  {grade:"Сталь 45", cat:"Конструкционные", gost:"ГОСТ 1050-2013", chem:"C 0.42-0.50, Mn 0.5-0.8, Si 0.17-0.37", mech:"σв ≥ 600 МПа, HB 170-229", app:"Валы, шестерни, оси — самая ходовая сталь для деталей под нагрузкой", analog:"AISI 1045, C45 (DIN)", file:"stal-45.pdf"},
+  {grade:"Сталь 40Х", cat:"Конструкционные", gost:"ГОСТ 4543-2016", chem:"C 0.36-0.44, Cr 0.8-1.1, Mn 0.5-0.8", mech:"σв ≥ 980 МПа, HB 217-269", app:"Валы, оси, зубчатые колёса под серьёзной нагрузкой (прочнее и прокаливается глубже, чем Сталь 45)", analog:"AISI 5140, 41Cr4 (DIN)", file:"stal-40h.pdf"},
+  {grade:"Сталь 20", cat:"Конструкционные", gost:"ГОСТ 1050-2013", chem:"C 0.17-0.24, Mn 0.35-0.65", mech:"σв ≥ 410 МПа, HB 131-179", app:"Цементируемые детали, втулки, некритичный крепёж — мягкая, легко сваривается", analog:"AISI 1020, C22 (DIN)", file:"stal-20.pdf"},
+  {grade:"Сталь Ст3сп", cat:"Конструкционные", gost:"ГОСТ 380-2005", chem:"C ≤0.22, Mn 0.4-0.65, Si 0.15-0.3", mech:"σв 370-480 МПа", app:"Сварные рамы, каркасы, некритичные детали — самая дешёвая и доступная сталь общего назначения", analog:"S235JR (EN), A36 (ASTM)", file:"stal-3sp.pdf"},
+  {grade:"Сталь 09Г2С", cat:"Конструкционные", gost:"ГОСТ 19281-2014", chem:"C ≤0.12, Mn 1.3-1.7, Si 0.5-0.8", mech:"σв ≥ 450 МПа", app:"Сварные металлоконструкции, рамы, работа при отрицательных температурах — низколегированная, хорошо варится", analog:"S355 (EN), A572 (ASTM)", file:"stal-09g2s.pdf"},
+  {grade:"Сталь 65Г", cat:"Пружинные / инструментальные", gost:"ГОСТ 14959-2016", chem:"C 0.62-0.70, Mn 0.9-1.2", mech:"σв ≥ 1000 МПа (после закалки)", app:"Пружины, шайбы Гровера, ножи, диски пил — хорошая упругость после закалки", analog:"AISI 1065, 65Mn (DIN)", file:"stal-65g.pdf"},
+  {grade:"Сталь 60С2А", cat:"Пружинные / инструментальные", gost:"ГОСТ 14959-2016", chem:"C 0.56-0.64, Si 1.5-2.0, Mn 0.6-0.9", mech:"σв ≥ 1600 МПа (закалка+отпуск)", app:"Ответственные пружины, рессоры, тарельчатые шайбы", analog:"AISI 9260, 55Si7 (EN)", file:"stal-60s2a.pdf"},
+  {grade:"Сталь У8А", cat:"Пружинные / инструментальные", gost:"ГОСТ 1435-99", chem:"C 0.75-0.84, углеродистая инструментальная", mech:"HRC 60-62 (после закалки)", app:"Слесарный инструмент, штампы простой формы, ножи — недорогая, но невысокая теплостойкость", analog:"AISI W1, C80U (DIN)", file:"stal-u8a.pdf"},
+  {grade:"Сталь Х12МФ", cat:"Пружинные / инструментальные", gost:"ГОСТ 5950-2000", chem:"C 1.45-1.65, Cr 11-12.5, Mo 0.4-0.6, V 0.15-0.3", mech:"HRC 58-61", app:"Штампы холодной штамповки, вырубные матрицы — высокая износостойкость, малая деформация при закалке", analog:"AISI D2, X153CrMoV12 (DIN)", file:"stal-h12mf.pdf"},
+  {grade:"Сталь Р6М5", cat:"Пружинные / инструментальные", gost:"ГОСТ 19265-73", chem:"C 0.82-0.9, W 5.5-6.5, Mo 4.8-5.3, Cr 3.8-4.4, V 1.7-2.1", mech:"HRC 63-65, теплостойкость до 600°C", app:"Свёрла, фрезы, метчики, резцы — быстрорежущая сталь для режущего инструмента", analog:"AISI M2, HS6-5-2 (DIN)", file:"stal-r6m5.pdf"},
+  {grade:"Сталь 12Х18Н10Т", cat:"Нержавеющие", gost:"ГОСТ 5632-2014", chem:"C ≤0.12, Cr 17-19, Ni 9-11, Ti", mech:"σв ≥ 550 МПа", app:"Коррозионностойкие детали, пищевое и химическое оборудование — сваривается без потери коррозионной стойкости", analog:"AISI 321, X6CrNiTi18-10", file:"stal-12h18n10t.pdf"},
+  {grade:"Сталь 20Х13", cat:"Нержавеющие", gost:"ГОСТ 5632-2014", chem:"C 0.16-0.25, Cr 12-14", mech:"σв ≥ 650 МПа, HRC до 50 (закалка)", app:"Ножи, хирургический и бытовой инструмент, детали насосов — мартенситная, закаливается на высокую твёрдость", analog:"AISI 420, X20Cr13 (DIN)", file:"stal-20h13.pdf"},
+  {grade:"Чугун СЧ20", cat:"Чугуны", gost:"ГОСТ 1412-85", chem:"C 3.2-3.5, Si 1.4-2.2, Mn 0.7-1.0", mech:"σв ≥ 200 МПа, HB 170-241", app:"Станины станков, корпуса редукторов, крышки — хорошо гасит вибрацию, дёшев в литье", analog:"Grey iron GG20 (DIN), Class 30 (ASTM)", file:"chugun-sch20.pdf"},
+  {grade:"Чугун ВЧ50", cat:"Чугуны", gost:"ГОСТ 7293-85", chem:"C 3.2-3.6, Si 2.0-2.8, шаровидный графит", mech:"σв ≥ 500 МПа, HB 170-230", app:"Коленвалы, зубчатые колёса, детали под ударной нагрузкой — заменяет литую сталь там, где не варить", analog:"Ductile iron GGG50 (DIN)", file:"chugun-vch50.pdf"},
+  {grade:"Алюминий Д16Т", cat:"Цветные сплавы", gost:"ГОСТ 4784-97", chem:"Al, Cu 3.8-4.9, Mg 1.2-1.8, Mn 0.3-0.9 (дюраль)", mech:"σв ≥ 390 МПа, плотность 2.78 г/см³", app:"Силовые конструкции в авиации, корпуса, где важна прочность при малом весе", analog:"AA 2024-T4", file:"al-d16t.pdf"},
+  {grade:"Алюминий АМг6", cat:"Цветные сплавы", gost:"ГОСТ 4784-97", chem:"Al, Mg 5.8-6.8, Mn 0.5-0.8", mech:"σв ≥ 300 МПа, отлично варится", app:"Сварные ёмкости, корпуса, судостроение — коррозионностойкий, хорошо варится в отличие от Д16Т", analog:"AA 5083", file:"al-amg6.pdf"},
+  {grade:"Латунь Л63", cat:"Цветные сплавы", gost:"ГОСТ 15527-2004", chem:"Cu 62-65, Zn остальное", mech:"σв ≥ 330 МПа, хорошая пластичность", app:"Втулки, гильзы, декоративная фурнитура, детали с хорошей обрабатываемостью", analog:"CuZn37 (EN), C27000", file:"latun-l63.pdf"},
+  {grade:"Бронза БрОФ10-1", cat:"Цветные сплавы", gost:"ГОСТ 5017-2006", chem:"Cu, Sn 9-11, P 0.4-1.1", mech:"σв ≥ 350 МПа, низкий коэфф. трения", app:"Втулки скольжения, подшипники без смазки, червячные венцы", analog:"CuSn10P (EN), C52400", file:"bronza-brof10-1.pdf"},
 ];
 
 const literatureData = [
@@ -695,13 +792,18 @@ renderGost();
 function renderMaterials(){
   const body = document.getElementById('mat-body');
   const q = document.getElementById('mat-search').value.trim().toLowerCase();
-  const filtered = materialsData.map((m,i)=>({...m,_i:i})).filter(m=>!q || m.grade.toLowerCase().includes(q) || m.gost.toLowerCase().includes(q));
+  const cat = document.getElementById('mat-cat').value;
+  const filtered = materialsData.map((m,i)=>({...m,_i:i})).filter(m=>{
+    const matchesQ = !q || m.grade.toLowerCase().includes(q) || m.gost.toLowerCase().includes(q);
+    const matchesCat = !cat || m.cat === cat;
+    return matchesQ && matchesCat;
+  });
   document.getElementById('mat-count').textContent = `Найдено: ${filtered.length} из ${materialsData.length}`;
   document.getElementById('mat-empty').style.display = filtered.length ? 'none':'block';
   body.innerHTML = filtered.map(m=>`
     <tr>
       <td class="star-cell"><button class="star ${isFav('materials',m._i)?'on':''}" data-page="materials" data-id="${m._i}">${isFav('materials',m._i)?'★':'☆'}</button></td>
-      <td style="font-weight:700; white-space:nowrap;">${m.grade}</td>
+      <td style="font-weight:700; white-space:nowrap;">${m.grade}<br><span class="tag" style="margin-top:4px;">${m.cat}</span></td>
       <td style="font-family:var(--mono); font-size:12.5px; white-space:nowrap;">${m.gost}</td>
       <td style="color:#4c6577; font-size:12.5px;">${m.chem}</td>
       <td style="color:#4c6577; font-size:12.5px;">${m.mech}</td>
@@ -711,7 +813,14 @@ function renderMaterials(){
     </tr>
   `).join('');
 }
+function populateMatFilters(){
+  const cats = [...new Set(materialsData.map(m=>m.cat))];
+  const sel = document.getElementById('mat-cat');
+  cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+}
 document.getElementById('mat-search').addEventListener('input', renderMaterials);
+document.getElementById('mat-cat').addEventListener('change', renderMaterials);
+populateMatFilters();
 renderMaterials();
 
 /* ============ RENDER: LITERATURE ============ */
@@ -1005,47 +1114,103 @@ renderFasteners();
 
 /* ============ DATA: BEARINGS ============ */
 const bearingsData = [
-  {code:"6000", d:10, D:26, B:8,  Cr:4.5,  C0r:2.4},
-  {code:"6001", d:12, D:28, B:8,  Cr:5.1,  C0r:2.85},
-  {code:"6002", d:15, D:32, B:9,  Cr:5.6,  C0r:3.25},
-  {code:"6003", d:17, D:35, B:10, Cr:6.0,  C0r:3.6},
-  {code:"6004", d:20, D:42, B:12, Cr:9.4,  C0r:5.65},
-  {code:"6200", d:10, D:30, B:9,  Cr:5.1,  C0r:2.4},
-  {code:"6201", d:12, D:32, B:10, Cr:6.8,  C0r:3.05},
-  {code:"6202", d:15, D:35, B:11, Cr:7.65, C0r:3.75},
-  {code:"6203", d:17, D:40, B:12, Cr:9.5,  C0r:4.75},
-  {code:"6204", d:20, D:47, B:14, Cr:12.7, C0r:6.55},
-  {code:"6205", d:25, D:52, B:15, Cr:14.0, C0r:7.8},
-  {code:"6206", d:30, D:62, B:16, Cr:19.5, C0r:11.2},
-  {code:"6207", d:35, D:72, B:17, Cr:25.5, C0r:15.3},
-  {code:"6208", d:40, D:80, B:18, Cr:29.5, C0r:18.0},
-  {code:"6305", d:25, D:62, B:17, Cr:22.5, C0r:11.9},
-  {code:"6306", d:30, D:72, B:19, Cr:28.1, C0r:14.6},
+  {code:"6000", type:"Шариковый радиальный", d:10, D:26, B:8,  Cr:4.5,  C0r:2.4},
+  {code:"6001", type:"Шариковый радиальный", d:12, D:28, B:8,  Cr:5.1,  C0r:2.85},
+  {code:"6002", type:"Шариковый радиальный", d:15, D:32, B:9,  Cr:5.6,  C0r:3.25},
+  {code:"6003", type:"Шариковый радиальный", d:17, D:35, B:10, Cr:6.0,  C0r:3.6},
+  {code:"6004", type:"Шариковый радиальный", d:20, D:42, B:12, Cr:9.4,  C0r:5.65},
+  {code:"6200", type:"Шариковый радиальный", d:10, D:30, B:9,  Cr:5.1,  C0r:2.4},
+  {code:"6201", type:"Шариковый радиальный", d:12, D:32, B:10, Cr:6.8,  C0r:3.05},
+  {code:"6202", type:"Шариковый радиальный", d:15, D:35, B:11, Cr:7.65, C0r:3.75},
+  {code:"6203", type:"Шариковый радиальный", d:17, D:40, B:12, Cr:9.5,  C0r:4.75},
+  {code:"6204", type:"Шариковый радиальный", d:20, D:47, B:14, Cr:12.7, C0r:6.55},
+  {code:"6205", type:"Шариковый радиальный", d:25, D:52, B:15, Cr:14.0, C0r:7.8},
+  {code:"6206", type:"Шариковый радиальный", d:30, D:62, B:16, Cr:19.5, C0r:11.2},
+  {code:"6207", type:"Шариковый радиальный", d:35, D:72, B:17, Cr:25.5, C0r:15.3},
+  {code:"6208", type:"Шариковый радиальный", d:40, D:80, B:18, Cr:29.5, C0r:18.0},
+  {code:"6209", type:"Шариковый радиальный", d:45, D:85, B:19, Cr:31.5, C0r:20.4},
+  {code:"6210", type:"Шариковый радиальный", d:50, D:90, B:20, Cr:35.0, C0r:23.2},
+  {code:"6300", type:"Шариковый радиальный", d:10, D:35, B:11, Cr:7.65, C0r:3.4},
+  {code:"6301", type:"Шариковый радиальный", d:12, D:37, B:12, Cr:9.75, C0r:4.15},
+  {code:"6302", type:"Шариковый радиальный", d:15, D:42, B:13, Cr:11.4, C0r:5.05},
+  {code:"6303", type:"Шариковый радиальный", d:17, D:47, B:14, Cr:13.5, C0r:6.0},
+  {code:"6304", type:"Шариковый радиальный", d:20, D:52, B:15, Cr:15.9, C0r:7.8},
+  {code:"6305", type:"Шариковый радиальный", d:25, D:62, B:17, Cr:22.5, C0r:11.9},
+  {code:"6306", type:"Шариковый радиальный", d:30, D:72, B:19, Cr:28.1, C0r:14.6},
+  {code:"6307", type:"Шариковый радиальный", d:35, D:80, B:21, Cr:33.2, C0r:19.0},
+  {code:"6308", type:"Шариковый радиальный", d:40, D:90, B:23, Cr:42.3, C0r:24.0},
+  {code:"30204", type:"Роликовый конический", d:20, D:47, B:15.25, Cr:26.2, C0r:30.0},
+  {code:"30205", type:"Роликовый конический", d:25, D:52, B:16.25, Cr:32.0, C0r:37.0},
+  {code:"30206", type:"Роликовый конический", d:30, D:62, B:17.25, Cr:43.0, C0r:49.0},
+  {code:"30207", type:"Роликовый конический", d:35, D:72, B:18.25, Cr:54.0, C0r:63.0},
+  {code:"30208", type:"Роликовый конический", d:40, D:80, B:19.75, Cr:63.0, C0r:74.0},
 ];
+function skfSearchLink(code){ return `https://www.skf.com/search?q=${encodeURIComponent(code)}`; }
 function renderBearings(){
   const body = document.getElementById('bearings-body');
   const q = document.getElementById('bearings-search').value.trim().toLowerCase();
-  const filtered = bearingsData.map((b,i)=>({...b,_i:i})).filter(b=>!q || b.code.toLowerCase().includes(q));
+  const type = document.getElementById('bearings-type').value;
+  const filtered = bearingsData.map((b,i)=>({...b,_i:i})).filter(b=>{
+    const matchesQ = !q || b.code.toLowerCase().includes(q);
+    const matchesType = !type || b.type === type;
+    return matchesQ && matchesType;
+  });
   document.getElementById('bearings-count').textContent = `Найдено: ${filtered.length} из ${bearingsData.length}`;
   document.getElementById('bearings-empty').style.display = filtered.length ? 'none':'block';
   body.innerHTML = filtered.map(b=>`
     <tr>
       <td class="star-cell"><button class="star ${isFav('bearings',b._i)?'on':''}" data-page="bearings" data-id="${b._i}">${isFav('bearings',b._i)?'★':'☆'}</button></td>
       <td style="font-family:var(--mono); font-weight:700;">${b.code}</td>
+      <td><span class="tag">${b.type}</span></td>
       <td>${b.d}</td>
       <td>${b.D}</td>
       <td>${b.B}</td>
       <td>${b.Cr}</td>
       <td>${b.C0r}</td>
+      <td style="white-space:nowrap;"><a class="doclink" href="${skfSearchLink(b.code)}" target="_blank" rel="noopener">SKF ↗</a></td>
     </tr>
   `).join('');
 }
+function populateBearingsFilters(){
+  const types = [...new Set(bearingsData.map(b=>b.type))];
+  const sel = document.getElementById('bearings-type');
+  types.forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t; sel.appendChild(o); });
+}
 document.getElementById('bearings-search').addEventListener('input', renderBearings);
+document.getElementById('bearings-type').addEventListener('change', renderBearings);
+populateBearingsFilters();
 favRenderMap.bearings = renderBearings;
 renderBearings();
 
 /* ============ DATA: SORTAMENT ============ */
 const sortamentData = [
+  {type:"Круг", size:"⌀10", weight:0.617, gost:"ГОСТ 2590-2006"},
+  {type:"Круг", size:"⌀12", weight:0.888, gost:"ГОСТ 2590-2006"},
+  {type:"Круг", size:"⌀16", weight:1.578, gost:"ГОСТ 2590-2006"},
+  {type:"Круг", size:"⌀20", weight:2.466, gost:"ГОСТ 2590-2006"},
+  {type:"Круг", size:"⌀25", weight:3.853, gost:"ГОСТ 2590-2006"},
+  {type:"Круг", size:"⌀30", weight:5.549, gost:"ГОСТ 2590-2006"},
+  {type:"Круг", size:"⌀40", weight:9.865, gost:"ГОСТ 2590-2006"},
+  {type:"Круг", size:"⌀50", weight:15.41, gost:"ГОСТ 2590-2006"},
+  {type:"Квадрат", size:"10×10", weight:0.785, gost:"ГОСТ 2591-2006"},
+  {type:"Квадрат", size:"12×12", weight:1.13,  gost:"ГОСТ 2591-2006"},
+  {type:"Квадрат", size:"16×16", weight:2.01,  gost:"ГОСТ 2591-2006"},
+  {type:"Квадрат", size:"20×20", weight:3.14,  gost:"ГОСТ 2591-2006"},
+  {type:"Квадрат", size:"25×25", weight:4.91,  gost:"ГОСТ 2591-2006"},
+  {type:"Квадрат", size:"30×30", weight:7.07,  gost:"ГОСТ 2591-2006"},
+  {type:"Полоса", size:"20×4", weight:0.628, gost:"ГОСТ 103-2006"},
+  {type:"Полоса", size:"30×4", weight:0.942, gost:"ГОСТ 103-2006"},
+  {type:"Полоса", size:"40×4", weight:1.256, gost:"ГОСТ 103-2006"},
+  {type:"Полоса", size:"50×5", weight:1.963, gost:"ГОСТ 103-2006"},
+  {type:"Полоса", size:"60×6", weight:2.826, gost:"ГОСТ 103-2006"},
+  {type:"Арматура рифлёная", size:"⌀6",  weight:0.222, gost:"ГОСТ 34028-2016"},
+  {type:"Арматура рифлёная", size:"⌀8",  weight:0.395, gost:"ГОСТ 34028-2016"},
+  {type:"Арматура рифлёная", size:"⌀10", weight:0.617, gost:"ГОСТ 34028-2016"},
+  {type:"Арматура рифлёная", size:"⌀12", weight:0.888, gost:"ГОСТ 34028-2016"},
+  {type:"Арматура рифлёная", size:"⌀14", weight:1.208, gost:"ГОСТ 34028-2016"},
+  {type:"Арматура рифлёная", size:"⌀16", weight:1.578, gost:"ГОСТ 34028-2016"},
+  {type:"Арматура рифлёная", size:"⌀18", weight:2.000, gost:"ГОСТ 34028-2016"},
+  {type:"Арматура рифлёная", size:"⌀20", weight:2.466, gost:"ГОСТ 34028-2016"},
   {type:"Уголок равнополочный", size:"25×25×3", weight:1.12, gost:"ГОСТ 8509-93"},
   {type:"Уголок равнополочный", size:"32×32×3", weight:1.46, gost:"ГОСТ 8509-93"},
   {type:"Уголок равнополочный", size:"40×40×4", weight:2.42, gost:"ГОСТ 8509-93"},
@@ -1057,10 +1222,17 @@ const sortamentData = [
   {type:"Швеллер", size:"№10", weight:8.59,  gost:"ГОСТ 8240-97"},
   {type:"Швеллер", size:"№12", weight:10.4,  gost:"ГОСТ 8240-97"},
   {type:"Швеллер", size:"№16", weight:14.2,  gost:"ГОСТ 8240-97"},
-  {type:"Труба электросварная", size:"20×2",   weight:0.888, gost:"ГОСТ 10704-91"},
-  {type:"Труба электросварная", size:"32×2.5", weight:1.86,  gost:"ГОСТ 10704-91"},
-  {type:"Труба электросварная", size:"57×3",   weight:3.95,  gost:"ГОСТ 10704-91"},
-  {type:"Труба электросварная", size:"76×3.5", weight:6.26,  gost:"ГОСТ 10704-91"},
+  {type:"Труба электросварная круглая", size:"20×2",   weight:0.888, gost:"ГОСТ 10704-91"},
+  {type:"Труба электросварная круглая", size:"32×2.5", weight:1.86,  gost:"ГОСТ 10704-91"},
+  {type:"Труба электросварная круглая", size:"57×3",   weight:3.95,  gost:"ГОСТ 10704-91"},
+  {type:"Труба электросварная круглая", size:"76×3.5", weight:6.26,  gost:"ГОСТ 10704-91"},
+  {type:"Труба профильная квадратная", size:"20×20×2", weight:1.06, gost:"ГОСТ 8639-82"},
+  {type:"Труба профильная квадратная", size:"25×25×2", weight:1.35, gost:"ГОСТ 8639-82"},
+  {type:"Труба профильная квадратная", size:"40×40×3", weight:3.03, gost:"ГОСТ 8639-82"},
+  {type:"Труба профильная квадратная", size:"60×60×3", weight:5.40, gost:"ГОСТ 8639-82"},
+  {type:"Труба профильная прямоугольная", size:"40×20×2", weight:1.75, gost:"ГОСТ 8645-68"},
+  {type:"Труба профильная прямоугольная", size:"60×40×3", weight:4.39, gost:"ГОСТ 8645-68"},
+  {type:"Труба профильная прямоугольная", size:"80×40×3", weight:5.32, gost:"ГОСТ 8645-68"},
   {type:"Лист горячекатаный (кг/м²)", size:"δ2", weight:15.7, gost:"ГОСТ 19903-2015"},
   {type:"Лист горячекатаный (кг/м²)", size:"δ4", weight:31.4, gost:"ГОСТ 19903-2015"},
   {type:"Лист горячекатаный (кг/м²)", size:"δ6", weight:47.1, gost:"ГОСТ 19903-2015"},
@@ -1069,7 +1241,12 @@ const sortamentData = [
 function renderSortament(){
   const body = document.getElementById('sortament-body');
   const q = document.getElementById('sortament-search').value.trim().toLowerCase();
-  const filtered = sortamentData.map((s,i)=>({...s,_i:i})).filter(s=>!q || (s.type+' '+s.size).toLowerCase().includes(q));
+  const cat = document.getElementById('sortament-cat').value;
+  const filtered = sortamentData.map((s,i)=>({...s,_i:i})).filter(s=>{
+    const matchesQ = !q || (s.type+' '+s.size).toLowerCase().includes(q);
+    const matchesCat = !cat || s.type === cat;
+    return matchesQ && matchesCat;
+  });
   document.getElementById('sortament-count').textContent = `Найдено: ${filtered.length} из ${sortamentData.length}`;
   document.getElementById('sortament-empty').style.display = filtered.length ? 'none':'block';
   body.innerHTML = filtered.map(s=>`
@@ -1082,7 +1259,14 @@ function renderSortament(){
     </tr>
   `).join('');
 }
+function populateSortamentFilters(){
+  const cats = [...new Set(sortamentData.map(s=>s.type))];
+  const sel = document.getElementById('sortament-cat');
+  cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+}
 document.getElementById('sortament-search').addEventListener('input', renderSortament);
+document.getElementById('sortament-cat').addEventListener('change', renderSortament);
+populateSortamentFilters();
 favRenderMap.sortament = renderSortament;
 renderSortament();
 
@@ -1108,20 +1292,24 @@ function renderHardness(){
 }
 renderHardness();
 
-/* ============ DATA: ROUGHNESS (static) ============ */
+/* ============ DATA: ROUGHNESS (static, стандартный предпочтительный ряд Ra) ============ */
 const roughnessData = [
-  {ra:12.5, rz:63, cls:"3",  method:"Черновое точение, фрезерование"},
-  {ra:6.3,  rz:32, cls:"4",  method:"Получистовое точение, фрезерование"},
-  {ra:3.2,  rz:16, cls:"5",  method:"Чистовое точение, фрезерование"},
-  {ra:1.6,  rz:8,  cls:"6",  method:"Чистовое точение, развёртывание"},
-  {ra:0.8,  rz:4,  cls:"7",  method:"Шлифование чистовое"},
-  {ra:0.4,  rz:2,  cls:"8",  method:"Шлифование тонкое"},
-  {ra:0.2,  rz:1,  cls:"9",  method:"Хонингование, суперфиниш"},
-  {ra:0.1,  rz:0.5,cls:"10", method:"Полирование"},
+  {ra:50,    rzApprox:200, method:"Черновое точение, строгание, фрезерование", where:"Необрабатываемые поверхности, литьё, черновые базы"},
+  {ra:25,    rzApprox:100, method:"Получистовое точение, фрезерование", where:"Нерабочие поверхности корпусных деталей"},
+  {ra:12.5,  rzApprox:50,  method:"Получистовое фрезерование, сверление", where:"Поверхности под сварку, необработанные отверстия"},
+  {ra:6.3,   rzApprox:25,  method:"Чистовое точение, фрезерование", where:"Посадочные поверхности низкой точности, крепёж"},
+  {ra:3.2,   rzApprox:13,  method:"Чистовое точение, развёртывание", where:"Большинство посадочных поверхностей общего машиностроения"},
+  {ra:1.6,   rzApprox:6.3, method:"Шлифование получистовое, точное развёртывание", where:"Посадки с натягом/переходные, валы под подшипники"},
+  {ra:0.8,   rzApprox:3.2, method:"Шлифование чистовое", where:"Точные посадочные поверхности, зеркала валов под сальники"},
+  {ra:0.4,   rzApprox:1.6, method:"Шлифование тонкое, хонингование", where:"Прецизионные подвижные посадки, направляющие"},
+  {ra:0.2,   rzApprox:0.8, method:"Хонингование, суперфиниш", where:"Зеркала гидроцилиндров, шейки коленвалов"},
+  {ra:0.1,   rzApprox:0.4, method:"Полирование, притирка", where:"Измерительный инструмент, прецизионные пары трения"},
+  {ra:0.05,  rzApprox:0.2, method:"Тонкое полирование", where:"Калибры, эталонные поверхности"},
+  {ra:0.025, rzApprox:0.1, method:"Зеркальное полирование", where:"Оптика, особо точный измерительный инструмент"},
 ];
 function renderRoughness(){
   document.getElementById('roughness-body').innerHTML = roughnessData.map(r=>`
-    <tr><td style="font-weight:700;">${r.ra}</td><td>${r.rz}</td><td>${r.cls}</td><td>${r.method}</td></tr>
+    <tr><td style="font-weight:700;">${r.ra}</td><td>${r.rzApprox}</td><td>${r.method}</td><td style="color:#4c6577;">${r.where}</td></tr>
   `).join('');
 }
 renderRoughness();
@@ -1207,6 +1395,122 @@ function computeMass(){
 document.getElementById('mass-shape').addEventListener('change', renderMassFields);
 massMaterialSel.addEventListener('change', computeMass);
 renderMassFields();
+
+/* ============ SECTION PROPERTIES CALCULATOR ============ */
+const sectionShapes = {
+  rect:   {fields:[{id:'sec-b', label:'Ширина b, мм', def:20},{id:'sec-h', label:'Высота h, мм', def:40}]},
+  square: {fields:[{id:'sec-a', label:'Сторона a, мм', def:20}]},
+  round:  {fields:[{id:'sec-d', label:'Диаметр d, мм', def:20}]},
+  pipe:   {fields:[{id:'sec-D', label:'Наружный диаметр D, мм', def:32},{id:'sec-di', label:'Внутренний диаметр d, мм', def:26}]},
+};
+function renderSecFields(){
+  const shape = document.getElementById('sec-shape').value;
+  const container = document.getElementById('sec-fields');
+  const fields = sectionShapes[shape].fields;
+  container.innerHTML = fields.map(f=>`
+    <div class="field">
+      <label for="${f.id}">${f.label}</label>
+      <input type="number" id="${f.id}" min="0.01" step="0.1" value="${f.def}">
+    </div>
+  `).join('');
+  fields.forEach(f=>document.getElementById(f.id).addEventListener('input', computeSection));
+  computeSection();
+}
+function computeSection(){
+  const shape = document.getElementById('sec-shape').value;
+  let A=0, Ix=0, Iy=0, cx=0, cy=0;
+  if(shape === 'rect'){
+    const b = parseFloat(document.getElementById('sec-b').value) || 0;
+    const h = parseFloat(document.getElementById('sec-h').value) || 0;
+    A = b*h; Ix = b*Math.pow(h,3)/12; Iy = h*Math.pow(b,3)/12; cx = h/2; cy = b/2;
+  } else if(shape === 'square'){
+    const a = parseFloat(document.getElementById('sec-a').value) || 0;
+    A = a*a; Ix = Math.pow(a,4)/12; Iy = Ix; cx = a/2; cy = a/2;
+  } else if(shape === 'round'){
+    const d = parseFloat(document.getElementById('sec-d').value) || 0;
+    A = Math.PI/4*d*d; Ix = Math.PI*Math.pow(d,4)/64; Iy = Ix; cx = d/2; cy = d/2;
+  } else if(shape === 'pipe'){
+    const D = parseFloat(document.getElementById('sec-D').value) || 0;
+    const di = parseFloat(document.getElementById('sec-di').value) || 0;
+    A = Math.PI/4*(D*D - di*di); Ix = Math.PI/64*(Math.pow(D,4) - Math.pow(di,4)); Iy = Ix; cx = D/2; cy = D/2;
+  }
+  const Wx = cx ? Ix/cx : 0;
+  const Wy = cy ? Iy/cy : 0;
+  const ix = A ? Math.sqrt(Ix/A) : 0;
+  const iy = A ? Math.sqrt(Iy/A) : 0;
+  document.getElementById('sec-output').innerHTML = `
+    <div class="result">
+      <div class="result-grid">
+        <div class="stat hi"><div class="k">Площадь A</div><div class="v">${A.toFixed(1)} мм²</div></div>
+        <div class="stat"><div class="k">Момент инерции Ix</div><div class="v">${Ix.toFixed(0)} мм⁴</div></div>
+        <div class="stat"><div class="k">Момент инерции Iy</div><div class="v">${Iy.toFixed(0)} мм⁴</div></div>
+      </div>
+      <div class="result-grid" style="margin-top:12px;">
+        <div class="stat"><div class="k">Момент сопротивления Wx</div><div class="v">${Wx.toFixed(1)} мм³</div></div>
+        <div class="stat"><div class="k">Момент сопротивления Wy</div><div class="v">${Wy.toFixed(1)} мм³</div></div>
+        <div class="stat"><div class="k">Радиус инерции ix / iy</div><div class="v">${ix.toFixed(1)} / ${iy.toFixed(1)} мм</div></div>
+      </div>
+    </div>
+  `;
+}
+document.getElementById('sec-shape').addEventListener('change', renderSecFields);
+renderSecFields();
+
+/* ============ BEAM DEFLECTION CALCULATOR ============ */
+let beamSupport = 'simple';
+let beamLoadType = 'point';
+const btnBeamSimple = document.getElementById('btn-beam-simple');
+const btnBeamCantilever = document.getElementById('btn-beam-cantilever');
+btnBeamSimple.onclick = ()=>{ beamSupport='simple'; btnBeamSimple.classList.add('active'); btnBeamCantilever.classList.remove('active'); computeBeam(); };
+btnBeamCantilever.onclick = ()=>{ beamSupport='cantilever'; btnBeamCantilever.classList.add('active'); btnBeamSimple.classList.remove('active'); computeBeam(); };
+const btnLoadPoint = document.getElementById('btn-load-point');
+const btnLoadDist = document.getElementById('btn-load-dist');
+function updateBeamLoadLabel(){
+  document.querySelector('label[for="beam-load"]').textContent = beamLoadType === 'point' ? 'Сила F, Н' : 'Распределённая нагрузка q, Н/мм';
+}
+btnLoadPoint.onclick = ()=>{ beamLoadType='point'; btnLoadPoint.classList.add('active'); btnLoadDist.classList.remove('active'); updateBeamLoadLabel(); computeBeam(); };
+btnLoadDist.onclick = ()=>{ beamLoadType='dist'; btnLoadDist.classList.add('active'); btnLoadPoint.classList.remove('active'); updateBeamLoadLabel(); computeBeam(); };
+const beamMaterials = {"Сталь":200, "Алюминий":70, "Медь":115, "Титан":110, "Чугун (серый)":100, "Латунь/бронза":100};
+const beamMaterialSel = document.getElementById('beam-material');
+Object.keys(beamMaterials).forEach(name=>{
+  const o = document.createElement('option'); o.value = name; o.textContent = `${name} (E=${beamMaterials[name]} ГПа)`;
+  beamMaterialSel.appendChild(o);
+});
+function computeBeam(){
+  const L = parseFloat(document.getElementById('beam-length').value) || 0;
+  const I = parseFloat(document.getElementById('beam-inertia').value) || 0;
+  const E = beamMaterials[beamMaterialSel.value] * 1000;
+  const load = parseFloat(document.getElementById('beam-load').value) || 0;
+  let delta = 0, M = 0;
+  if(!E || !I){
+    document.getElementById('beam-output').innerHTML = '<div class="missing">⚠ Укажи момент инерции больше нуля.</div>';
+    return;
+  }
+  if(beamSupport === 'simple' && beamLoadType === 'point'){
+    delta = load*Math.pow(L,3)/(48*E*I); M = load*L/4;
+  } else if(beamSupport === 'simple' && beamLoadType === 'dist'){
+    delta = 5*load*Math.pow(L,4)/(384*E*I); M = load*L*L/8;
+  } else if(beamSupport === 'cantilever' && beamLoadType === 'point'){
+    delta = load*Math.pow(L,3)/(3*E*I); M = load*L;
+  } else if(beamSupport === 'cantilever' && beamLoadType === 'dist'){
+    delta = load*Math.pow(L,4)/(8*E*I); M = load*L*L/2;
+  }
+  document.getElementById('beam-output').innerHTML = `
+    <div class="result">
+      <div class="result-grid">
+        <div class="stat hi"><div class="k">Макс. прогиб δ</div><div class="v">${delta.toFixed(3)} мм</div></div>
+        <div class="stat"><div class="k">Макс. изгибающий момент</div><div class="v">${(M/1000).toFixed(2)} Н·м</div></div>
+        <div class="stat"><div class="k">Отношение δ / L</div><div class="v">1 / ${delta ? Math.round(L/delta) : '—'}</div></div>
+      </div>
+    </div>
+  `;
+}
+document.getElementById('beam-length').addEventListener('input', computeBeam);
+document.getElementById('beam-inertia').addEventListener('input', computeBeam);
+document.getElementById('beam-load').addEventListener('input', computeBeam);
+beamMaterialSel.addEventListener('change', computeBeam);
+updateBeamLoadLabel();
+computeBeam();
 
 /* ============ FAVORITES PAGE ============ */
 const dataArrays = { gost:gostData, materials:materialsData, literature:literatureData, threads:threadsData, fasteners:fastenersData, bearings:bearingsData, sortament:sortamentData };
