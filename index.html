@@ -14,10 +14,12 @@
   :root{
     --blueprint: #0b3d63;
     --blueprint-line: #2f6690;
+    --grid-line: rgba(88,150,193,.35);
     --paper: #eef3f6;
     --paper-line: #c9d8e2;
     --ink: #0d2130;
     --accent: #ff6a3d;
+    --accent-soft: rgba(255,106,61,.16);
     --ok: #1f8a5f;
     --mono: 'JetBrains Mono', monospace;
     --sans: 'IBM Plex Sans', sans-serif;
@@ -29,8 +31,8 @@
     font-family:var(--sans);
     background:var(--blueprint);
     background-image:
-      linear-gradient(var(--blueprint-line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px);
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 28px 28px;
     color:var(--paper);
     min-height:100vh;
@@ -70,6 +72,7 @@
   nav button.active{
     background:#fff; color:var(--blueprint); font-weight:700;
   }
+  .nav-divider{ width:1px; height:20px; background:var(--blueprint-line); margin:0 2px; align-self:center; }
   .hamburger{
     display:none;
     margin-left:auto;
@@ -90,6 +93,7 @@
     }
     nav.open{ display:flex; }
     nav button{ width:100%; text-align:left; padding:13px 14px; }
+    .nav-divider{ width:100%; height:1px; margin:4px 0; }
   }
 
   .wrap{max-width:1080px;margin:0 auto; padding: 28px 16px 70px;}
@@ -117,14 +121,29 @@
   }
 
   /* home cards */
-  .cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:16px; margin-top:24px; }
+  .card-group{ margin-top:36px; }
+  .card-group-label{
+    font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); font-weight:700; margin-bottom:12px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .card-group-label::after{ content:""; flex:1; height:1px; background:var(--blueprint-line); }
+  .cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:16px; }
   .card{
     background:var(--paper); color:var(--ink); border-radius:4px; padding:20px;
-    cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.22); transition: transform .15s ease;
-    border:1px solid var(--paper-line);
+    cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.22); transition: transform .15s ease, box-shadow .15s ease;
+    border:1px solid var(--paper-line); border-top:3px solid var(--paper-line);
+    position:relative;
   }
-  .card:hover{ transform: translateY(-3px); }
+  .card:hover{ transform: translateY(-4px); box-shadow:0 14px 28px rgba(0,0,0,.32); border-top-color:var(--accent); }
+  .card .card-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
   .card .num{ font-family:var(--mono); color:var(--accent); font-weight:700; font-size:13px; }
+  .card .kind{
+    font-family:var(--mono); font-size:10px; letter-spacing:.05em; text-transform:uppercase;
+    padding:2px 8px; border-radius:20px; white-space:nowrap;
+  }
+  .card .kind.ref{ background:#dbe7ee; color:var(--blueprint); }
+  .card .kind.calc{ background:var(--accent-soft); color:#c8481f; }
   .card h3{ margin:8px 0 6px; font-size:18px; }
   .card p{ margin:0; font-size:13px; color:#4c6577; line-height:1.5;}
 
@@ -208,9 +227,10 @@
   .toggle-group button.active{ background:var(--blueprint); border-color:var(--blueprint); color:#fff; }
   .result{ margin-top:24px; border-top: 2px dashed var(--paper-line); padding-top:20px; }
   .result-grid{display:flex; gap:16px; flex-wrap:wrap;}
-  .stat{ flex:1; min-width:150px; background:#fff; border:1.5px solid var(--paper-line); border-radius:3px; padding:14px 16px; }
+  .stat{ flex:1; min-width:150px; background:#fff; border:1.5px solid var(--paper-line); border-left:3px solid var(--paper-line); border-radius:3px; padding:14px 16px; }
   .stat .k{font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#4c6577;}
   .stat .v{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--blueprint); margin-top:4px;}
+  .stat.hi{ border-left-color:var(--accent); background:var(--accent-soft); }
   .stat.hi .v{color:var(--accent);}
   .diagram{ margin-top:20px; height:120px; position:relative; background:#fff; border:1.5px solid var(--paper-line); border-radius:3px; overflow:hidden; }
   .zero-line{position:absolute; left:0; right:0; top:60px; height:1px; background:#b7c6cf;}
@@ -275,18 +295,22 @@
     <button class="hamburger" id="nav-toggle" aria-label="Меню" aria-expanded="false">☰</button>
     <nav id="nav">
       <button data-page="home" class="active">Главная</button>
+      <span class="nav-divider"></span>
       <button data-page="gost">ГОСТы</button>
       <button data-page="threads">Резьбы</button>
       <button data-page="fasteners">Крепёж</button>
       <button data-page="tolerances">Допуски и посадки</button>
       <button data-page="bearings">Подшипники</button>
+      <span class="nav-divider"></span>
       <button data-page="materials">Материалы</button>
       <button data-page="sortament">Сортамент</button>
       <button data-page="hardness">Твёрдость</button>
       <button data-page="roughness">Шероховатость</button>
+      <span class="nav-divider"></span>
       <button data-page="mass">Расчёт массы</button>
       <button data-page="sections">Сечения</button>
       <button data-page="beams">Балки</button>
+      <span class="nav-divider"></span>
       <button data-page="literature">Литература</button>
       <button data-page="favorites">★ Избранное</button>
     </nav>
@@ -304,77 +328,99 @@
     <div class="eyebrow">Личная база · Механическое проектирование</div>
     <h1>Инженерный справочник</h1>
     <p class="sub">ГОСТы, допуски и посадки, марки сталей, литература — всё в одном месте, без переключения между вкладками.</p>
-    <div class="cards">
-      <div class="card" onclick="showPage('gost')">
-        <div class="num">01</div>
-        <h3>ГОСТы / Стандарты</h3>
-        <p>Резьбы, допуски, чертежи, сварка, материалы — с фильтром по категории и статусу.</p>
+    <div class="card-group">
+      <div class="card-group-label">Стандарты и элементы</div>
+      <div class="cards">
+        <div class="card" onclick="showPage('gost')">
+          <div class="card-top"><div class="num">01</div><span class="kind ref">справочник</span></div>
+          <h3>ГОСТы / Стандарты</h3>
+          <p>Резьбы, допуски, чертежи, сварка, материалы — с фильтром по категории и статусу.</p>
+        </div>
+        <div class="card" onclick="showPage('threads')">
+          <div class="card-top"><div class="num">02</div><span class="kind ref">справочник</span></div>
+          <h3>Резьбы</h3>
+          <p>Метрическая резьба: шаг, диаметр сверла под резьбу, площадь сечения.</p>
+        </div>
+        <div class="card" onclick="showPage('fasteners')">
+          <div class="card-top"><div class="num">03</div><span class="kind ref">справочник</span></div>
+          <h3>Крепёж</h3>
+          <p>Болты/гайки: размер ключа, высота гайки, диаметр шайбы.</p>
+        </div>
+        <div class="card" onclick="showPage('tolerances')">
+          <div class="card-top"><div class="num">04</div><span class="kind calc">калькулятор</span></div>
+          <h3>Допуски и посадки</h3>
+          <p>Калькулятор полей допусков + справочные таблицы IT-квалитетов.</p>
+        </div>
+        <div class="card" onclick="showPage('bearings')">
+          <div class="card-top"><div class="num">05</div><span class="kind calc">калькулятор</span></div>
+          <h3>Подшипники</h3>
+          <p>Подбор по нагрузке и ресурсу + полная таблица размеров.</p>
+        </div>
       </div>
-      <div class="card" onclick="showPage('threads')">
-        <div class="num">02</div>
-        <h3>Резьбы</h3>
-        <p>Метрическая резьба: шаг, диаметр сверла под резьбу, площадь сечения.</p>
+    </div>
+
+    <div class="card-group">
+      <div class="card-group-label">Материалы и сортамент</div>
+      <div class="cards">
+        <div class="card" onclick="showPage('materials')">
+          <div class="card-top"><div class="num">06</div><span class="kind ref">справочник</span></div>
+          <h3>Материалы</h3>
+          <p>Стали и сплавы: химсостав, механические свойства, зарубежные аналоги.</p>
+        </div>
+        <div class="card" onclick="showPage('sortament')">
+          <div class="card-top"><div class="num">07</div><span class="kind ref">справочник</span></div>
+          <h3>Сортамент проката</h3>
+          <p>Уголок, швеллер, труба, лист — вес погонного метра.</p>
+        </div>
+        <div class="card" onclick="showPage('hardness')">
+          <div class="card-top"><div class="num">08</div><span class="kind ref">справочник</span></div>
+          <h3>Твёрдость</h3>
+          <p>Перевод HB ↔ HRC ↔ HV ↔ предел прочности.</p>
+        </div>
+        <div class="card" onclick="showPage('roughness')">
+          <div class="card-top"><div class="num">09</div><span class="kind ref">справочник</span></div>
+          <h3>Шероховатость</h3>
+          <p>Ra ↔ Rz и типичные методы обработки поверхности.</p>
+        </div>
       </div>
-      <div class="card" onclick="showPage('fasteners')">
-        <div class="num">03</div>
-        <h3>Крепёж</h3>
-        <p>Болты/гайки: размер ключа, высота гайки, диаметр шайбы.</p>
+    </div>
+
+    <div class="card-group">
+      <div class="card-group-label">Калькуляторы</div>
+      <div class="cards">
+        <div class="card" onclick="showPage('mass')">
+          <div class="card-top"><div class="num">10</div><span class="kind calc">калькулятор</span></div>
+          <h3>Расчёт массы</h3>
+          <p>Масса круга, квадрата, шестигранника, трубы, листа по материалу.</p>
+        </div>
+        <div class="card" onclick="showPage('sections')">
+          <div class="card-top"><div class="num">11</div><span class="kind calc">калькулятор</span></div>
+          <h3>Сечения</h3>
+          <p>Площадь, момент инерции, момент сопротивления для прямоугольника, круга, трубы.</p>
+        </div>
+        <div class="card" onclick="showPage('beams')">
+          <div class="card-top"><div class="num">12</div><span class="kind calc">калькулятор</span></div>
+          <h3>Балки на прогиб</h3>
+          <p>Максимальный прогиб и изгибающий момент для балки и консоли.</p>
+        </div>
       </div>
-      <div class="card" onclick="showPage('tolerances')">
-        <div class="num">04</div>
-        <h3>Допуски и посадки</h3>
-        <p>Калькулятор полей допусков + справочные таблицы IT-квалитетов.</p>
+    </div>
+
+    <div class="card-group">
+      <div class="card-group-label">Справочники и утилиты</div>
+      <div class="cards">
+        <div class="card" onclick="showPage('literature')">
+          <div class="card-top"><div class="num">13</div><span class="kind ref">справочник</span></div>
+          <h3>Литература</h3>
+          <p>Анурьев и другие справочники — оглавление, разделы, ключевые таблицы.</p>
+        </div>
+        <div class="card" onclick="showPage('favorites')">
+          <div class="card-top"><div class="num">★</div></div>
+          <h3>Избранное</h3>
+          <p>Всё, что ты закрепил звёздочкой — в одном списке.</p>
+        </div>
       </div>
-      <div class="card" onclick="showPage('bearings')">
-        <div class="num">05</div>
-        <h3>Подшипники</h3>
-        <p>Серии 6000/6200: посадочные размеры, грузоподъёмность.</p>
-      </div>
-      <div class="card" onclick="showPage('materials')">
-        <div class="num">06</div>
-        <h3>Материалы</h3>
-        <p>Стали и сплавы: химсостав, механические свойства, зарубежные аналоги.</p>
-      </div>
-      <div class="card" onclick="showPage('sortament')">
-        <div class="num">07</div>
-        <h3>Сортамент проката</h3>
-        <p>Уголок, швеллер, труба, лист — вес погонного метра.</p>
-      </div>
-      <div class="card" onclick="showPage('hardness')">
-        <div class="num">08</div>
-        <h3>Твёрдость</h3>
-        <p>Перевод HB ↔ HRC ↔ HV ↔ предел прочности.</p>
-      </div>
-      <div class="card" onclick="showPage('roughness')">
-        <div class="num">09</div>
-        <h3>Шероховатость</h3>
-        <p>Ra ↔ Rz и типичные методы обработки поверхности.</p>
-      </div>
-      <div class="card" onclick="showPage('mass')">
-        <div class="num">10</div>
-        <h3>Расчёт массы</h3>
-        <p>Масса круга, квадрата, шестигранника, трубы, листа по материалу.</p>
-      </div>
-      <div class="card" onclick="showPage('sections')">
-        <div class="num">11</div>
-        <h3>Сечения</h3>
-        <p>Площадь, момент инерции, момент сопротивления для прямоугольника, круга, трубы.</p>
-      </div>
-      <div class="card" onclick="showPage('beams')">
-        <div class="num">12</div>
-        <h3>Балки на прогиб</h3>
-        <p>Максимальный прогиб и изгибающий момент для балки и консоли.</p>
-      </div>
-      <div class="card" onclick="showPage('literature')">
-        <div class="num">13</div>
-        <h3>Литература</h3>
-        <p>Анурьев и другие справочники — оглавление, разделы, ключевые таблицы.</p>
-      </div>
-      <div class="card" onclick="showPage('favorites')">
-        <div class="num">★</div>
-        <h3>Избранное</h3>
-        <p>Всё, что ты закрепил звёздочкой — в одном списке.</p>
-      </div>
+    </div>
     </div>
 
     <details class="howto" style="margin-top:32px; background:#fdf3d8; border-color:#e8cf80; color:#5a4300;">
